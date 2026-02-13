@@ -40,6 +40,5 @@ const customerSchema = new mongoose.Schema({
 // Compound index for user + customer name uniqueness
 customerSchema.index({ user: 1, name: 1 });
 customerSchema.index({ user: 1, balance: 1 });
-customerSchema.index({ shareToken: 1 });
 
 module.exports = mongoose.model('Customer', customerSchema);

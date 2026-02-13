@@ -190,7 +190,7 @@ const PublicKhata = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 pb-6">
-          <p className="text-xs text-gray-400">📒 Powered by Smart Khata</p>
+          <p className="text-xs text-gray-400">📒 Powered By Shafiq Ullah Khan</p>
         </div>
       </div>
     </div>

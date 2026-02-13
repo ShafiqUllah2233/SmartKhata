@@ -103,6 +103,67 @@ exports.getTransactions = async (req, res) => {
   }
 };
 
+// @desc    Add shared expense divided among all members
+// @route   POST /api/transactions/shared-expense
+exports.addSharedExpense = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { amount, description } = req.body;
+
+    // Get all customers for this user
+    const customers = await Customer.find({ user: req.user._id });
+
+    if (customers.length === 0) {
+      return res.status(400).json({ message: 'No customers found. Add customers first.' });
+    }
+
+    // Divide by (customers + admin)
+    const totalMembers = customers.length + 1;
+    const perPerson = Math.round((amount / totalMembers) * 100) / 100; // Round to 2 decimals
+
+    const transactions = [];
+    const expDesc = description ? `Shared: ${description}` : `Shared expense (${totalMembers} members)`;
+
+    for (const customer of customers) {
+      const newBalance = customer.balance + perPerson; // GIVEN increases balance (customer owes more)
+
+      const transaction = await Transaction.create({
+        customer: customer._id,
+        user: req.user._id,
+        type: 'GIVEN',
+        amount: perPerson,
+        description: expDesc,
+        date: Date.now(),
+        balanceAfter: newBalance
+      });
+
+      customer.balance = newBalance;
+      await customer.save();
+
+      transactions.push({
+        customer: customer.name,
+        amount: perPerson,
+        newBalance
+      });
+    }
+
+    res.status(201).json({
+      message: `Rs. ${amount} divided among ${totalMembers} members (Rs. ${perPerson} each)`,
+      totalAmount: amount,
+      totalMembers,
+      perPerson,
+      adminShare: perPerson,
+      transactions
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // @desc    Delete a transaction
 // @route   DELETE /api/transactions/:id
 exports.deleteTransaction = async (req, res) => {

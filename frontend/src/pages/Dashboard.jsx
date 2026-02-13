@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getDashboard, getCustomers, getMe } from '../api';
+import { getDashboard, getCustomers, getMe, addSharedExpense } from '../api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
@@ -20,6 +20,11 @@ const Dashboard = () => {
   const [recentCustomers, setRecentCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [groupToken, setGroupToken] = useState(null);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseAmount, setExpenseAmount] = useState('');
+  const [expenseDesc, setExpenseDesc] = useState('');
+  const [expenseLoading, setExpenseLoading] = useState(false);
+  const [totalCustomers, setTotalCustomers] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -33,6 +38,7 @@ const Dashboard = () => {
       ]);
       setStats(dashRes.data);
       setRecentCustomers(custRes.data.slice(0, 5));
+      setTotalCustomers(custRes.data.length);
       // Fetch group share token
       try {
         const meRes = await getMe();
@@ -44,6 +50,27 @@ const Dashboard = () => {
       toast.error('Failed to load dashboard');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSharedExpense = async () => {
+    const amt = parseFloat(expenseAmount);
+    if (!amt || amt <= 0) {
+      toast.error('Enter a valid amount');
+      return;
+    }
+    setExpenseLoading(true);
+    try {
+      const res = await addSharedExpense({ amount: amt, description: expenseDesc });
+      toast.success(res.data.message);
+      setShowExpenseModal(false);
+      setExpenseAmount('');
+      setExpenseDesc('');
+      fetchData(); // refresh dashboard
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to add shared expense');
+    } finally {
+      setExpenseLoading(false);
     }
   };
 
@@ -77,13 +104,22 @@ const Dashboard = () => {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">{user?.name || 'User'}</h1>
             <p className="text-emerald-100/80 text-sm sm:text-base">Here is your account overview for today</p>
           </div>
-          <Link
-            to="/customers/new"
-            className="mt-5 sm:mt-0 inline-flex items-center space-x-2 bg-white text-emerald-700 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-all duration-200 shadow-lg shadow-black/10 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-          >
-            <HiOutlinePlus className="w-5 h-5" />
-            <span>Add Customer</span>
-          </Link>
+          <div className="mt-5 sm:mt-0 flex flex-wrap gap-3">
+            <Link
+              to="/customers/new"
+              className="inline-flex items-center space-x-2 bg-white text-emerald-700 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-emerald-50 transition-all duration-200 shadow-lg shadow-black/10 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <HiOutlinePlus className="w-5 h-5" />
+              <span>Add Customer</span>
+            </Link>
+            <button
+              onClick={() => setShowExpenseModal(true)}
+              className="inline-flex items-center space-x-2 bg-amber-400 text-amber-900 px-6 py-3 rounded-2xl font-bold text-sm hover:bg-amber-300 transition-all duration-200 shadow-lg shadow-black/10 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <HiOutlineCash className="w-5 h-5" />
+              <span>Shared Expense</span>
+            </button>
+          </div>
         </div>
         {/* Share Group Khata Link */}
         {groupToken && (
@@ -232,6 +268,74 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Shared Expense Modal */}
+      {showExpenseModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowExpenseModal(false)}>
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
+                <HiOutlineCash className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">Shared Expense</h3>
+                <p className="text-sm text-gray-400">Split equally among all members</p>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
+              <p className="text-sm text-amber-800 font-medium">
+                Total members: <span className="font-bold text-amber-900">{totalCustomers + 1}</span> ({totalCustomers} customers + you)
+              </p>
+              {expenseAmount && parseFloat(expenseAmount) > 0 && (
+                <p className="text-sm text-amber-800 mt-1">
+                  Per person: <span className="font-bold text-amber-900">Rs. {(Math.round((parseFloat(expenseAmount) / (totalCustomers + 1)) * 100) / 100).toLocaleString()}</span>
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Total Amount (Rs.)</label>
+                <input
+                  type="number"
+                  value={expenseAmount}
+                  onChange={e => setExpenseAmount(e.target.value)}
+                  placeholder="e.g. 500"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none text-lg font-bold"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Description (optional)</label>
+                <input
+                  type="text"
+                  value={expenseDesc}
+                  onChange={e => setExpenseDesc(e.target.value)}
+                  placeholder="e.g. Grocery, Dinner, etc."
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex space-x-3 mt-6">
+              <button
+                onClick={() => setShowExpenseModal(false)}
+                className="flex-1 px-4 py-3 border border-gray-200 text-gray-600 rounded-2xl font-semibold hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSharedExpense}
+                disabled={expenseLoading || !expenseAmount}
+                className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-2xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {expenseLoading ? 'Splitting...' : 'Split & Add'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

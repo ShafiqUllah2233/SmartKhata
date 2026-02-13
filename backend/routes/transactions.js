@@ -5,10 +5,17 @@ const { protect } = require('../middleware/auth');
 const {
   addTransaction,
   getTransactions,
-  deleteTransaction
+  deleteTransaction,
+  addSharedExpense
 } = require('../controllers/transactionController');
 
 router.use(protect);
+
+// Shared expense route (must be before /:id to avoid conflict)
+router.route('/shared-expense')
+  .post([
+    body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be greater than 0')
+  ], addSharedExpense);
 
 // Routes under /api/customers/:customerId/transactions
 router.route('/')

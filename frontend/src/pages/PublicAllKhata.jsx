@@ -128,20 +128,14 @@ const PublicAllKhata = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Given</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.summary?.totalGiven || 0).toLocaleString()}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customerDetail.customer.balance > 0 ? 'bg-rose-500/20 border-rose-300/30' : 'bg-white/10 border-white/10'}`}>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Maine Lene Hain</p>
+                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.customer.balance > 0 ? customerDetail.customer.balance : 0).toLocaleString()}</p>
               </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Received</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.summary?.totalReceived || 0).toLocaleString()}</p>
-              </div>
-              <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center border border-white/20">
-                <p className="text-xs text-yellow-200 font-bold uppercase tracking-wider">
-                  {customerDetail.customer.balance > 0 ? 'To Receive' : customerDetail.customer.balance < 0 ? 'To Pay' : 'Settled'}
-                </p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {Math.abs(customerDetail.customer.balance).toLocaleString()}</p>
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customerDetail.customer.balance < 0 ? 'bg-emerald-500/20 border-emerald-300/30' : 'bg-white/10 border-white/10'}`}>
+                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Maine Dene Hain</p>
+                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.customer.balance < 0 ? Math.abs(customerDetail.customer.balance) : 0).toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -215,7 +209,7 @@ const PublicAllKhata = () => {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-rose-600' : 'text-emerald-600'}`}>
-                      {tx.type === 'GIVEN' ? '+' : '-'} Rs. {tx.amount.toLocaleString()}
+                      {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
                   </div>
@@ -254,18 +248,14 @@ const PublicAllKhata = () => {
             <h2 className="text-xl font-bold text-white mb-1">📊 Overall Summary</h2>
             <p className="text-sm text-emerald-100/70 mb-5">{data.summary.totalCustomers} Members</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Total Given</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${data.summary.totalOwed > 0 ? 'bg-rose-500/20 border-rose-300/30' : 'bg-white/10 border-white/10'}`}>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Maine Lene Hain</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwed.toLocaleString()}</p>
               </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Total Received</p>
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${data.summary.totalOwing > 0 ? 'bg-emerald-500/20 border-emerald-300/30' : 'bg-white/10 border-white/10'}`}>
+                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Maine Dene Hain</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwing.toLocaleString()}</p>
-              </div>
-              <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center border border-white/20">
-                <p className="text-xs text-yellow-200 font-bold uppercase tracking-wider">Net Balance</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.netBalance.toLocaleString()}</p>
               </div>
             </div>
           </div>
@@ -297,9 +287,9 @@ const PublicAllKhata = () => {
                   </p>
                   <p className="text-xs font-medium mt-0.5">
                     {c.balance > 0 ? (
-                      <span className="text-rose-500">To Receive ↗</span>
+                      <span className="text-rose-500">Maine Lene Hain ↗</span>
                     ) : c.balance < 0 ? (
-                      <span className="text-emerald-500">To Pay ↙</span>
+                      <span className="text-emerald-500">Maine Dene Hain ↙</span>
                     ) : (
                       <span className="text-gray-400">Settled ✓</span>
                     )}

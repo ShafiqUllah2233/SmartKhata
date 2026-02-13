@@ -97,13 +97,13 @@ const PublicKhata = () => {
 
             {/* Balance Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
-              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customer.balance > 0 ? 'bg-emerald-500/20 border-emerald-300/30' : 'bg-white/10 border-white/10'}`}>
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customer.balance < 0 ? 'bg-emerald-500/20 border-emerald-300/30' : 'bg-white/10 border-white/10'}`}>
                 <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Maine Lene Hain</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customer.balance > 0 ? customer.balance : 0).toLocaleString()}</p>
-              </div>
-              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customer.balance < 0 ? 'bg-rose-500/20 border-rose-300/30' : 'bg-white/10 border-white/10'}`}>
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Maine Dene Hain</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customer.balance < 0 ? Math.abs(customer.balance) : 0).toLocaleString()}</p>
+              </div>
+              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${customer.balance > 0 ? 'bg-rose-500/20 border-rose-300/30' : 'bg-white/10 border-white/10'}`}>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Maine Dene Hain</p>
+                <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customer.balance > 0 ? customer.balance : 0).toLocaleString()}</p>
               </div>
             </div>
           </div>

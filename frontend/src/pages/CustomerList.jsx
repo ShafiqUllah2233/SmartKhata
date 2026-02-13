@@ -127,8 +127,8 @@ const CustomerList = () => {
             className="px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white outline-none text-sm font-medium text-gray-600 cursor-pointer"
           >
             <option value="">All Balances</option>
-            <option value="positive">To Receive</option>
-            <option value="negative">To Pay</option>
+            <option value="positive">Maine Lene Hain</option>
+            <option value="negative">Maine Dene Hain</option>
             <option value="settled">Settled</option>
           </select>
           <select
@@ -209,9 +209,9 @@ const CustomerList = () => {
                           : 'text-gray-400'
                       }`}>
                         {customer.balance > 0
-                          ? 'You will receive'
+                          ? 'Maine Lene Hain'
                           : customer.balance < 0
-                          ? 'You will pay'
+                          ? 'Maine Dene Hain'
                           : 'Settled'}
                       </p>
                     </div>

@@ -123,22 +123,20 @@ const Dashboard = () => {
           textColor="text-blue-600"
         />
         <StatCard
-          title="To Receive"
+          title="Maine Lene Hain"
           value={`Rs. ${(stats?.totalToReceive || 0).toLocaleString()}`}
           icon={<HiOutlineTrendingUp className="w-6 h-6" />}
           gradient="from-emerald-500 to-emerald-600"
           bgLight="bg-emerald-50"
           textColor="text-emerald-600"
-          subtitle="Customers owe you"
         />
         <StatCard
-          title="To Pay"
+          title="Maine Dene Hain"
           value={`Rs. ${(stats?.totalToPay || 0).toLocaleString()}`}
           icon={<HiOutlineTrendingDown className="w-6 h-6" />}
           gradient="from-rose-500 to-rose-600"
           bgLight="bg-rose-50"
           textColor="text-rose-600"
-          subtitle="You owe customers"
         />
         <StatCard
           title="Net Balance"
@@ -221,9 +219,9 @@ const Dashboard = () => {
                         : 'text-gray-400'
                     }`}>
                       {customer.balance > 0
-                        ? 'To Receive'
+                        ? 'Maine Lene Hain'
                         : customer.balance < 0
-                        ? 'To Pay'
+                        ? 'Maine Dene Hain'
                         : 'Settled ✓'}
                     </p>
                   </div>

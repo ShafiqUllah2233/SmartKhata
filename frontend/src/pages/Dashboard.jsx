@@ -139,7 +139,7 @@ const Dashboard = () => {
           textColor="text-rose-600"
         />
         <StatCard
-          title="Net Balance"
+          title="Total Khata"
           value={`Rs. ${(stats?.netBalance || 0).toLocaleString()}`}
           icon={<HiOutlineCash className="w-6 h-6" />}
           gradient="from-violet-500 to-violet-600"

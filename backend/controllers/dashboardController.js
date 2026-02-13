@@ -22,7 +22,7 @@ exports.getDashboard = async (req, res) => {
       totalCustomers: customers.length,
       totalToReceive,
       totalToPay,
-      netBalance: totalToReceive - totalToPay
+      netBalance: totalToReceive + totalToPay
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

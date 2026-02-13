@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getDashboard, getCustomers } from '../api';
+import { getDashboard, getCustomers, getMe } from '../api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
@@ -10,7 +10,8 @@ import {
   HiOutlineTrendingDown,
   HiOutlinePlus,
   HiOutlineArrowRight,
-  HiOutlineChartBar
+  HiOutlineChartBar,
+  HiOutlineShare
 } from 'react-icons/hi';
 
 const Dashboard = () => {
@@ -18,6 +19,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentCustomers, setRecentCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [groupToken, setGroupToken] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -31,6 +33,13 @@ const Dashboard = () => {
       ]);
       setStats(dashRes.data);
       setRecentCustomers(custRes.data.slice(0, 5));
+      // Fetch group share token
+      try {
+        const meRes = await getMe();
+        if (meRes.data?.groupShareToken) {
+          setGroupToken(meRes.data.groupShareToken);
+        }
+      } catch (e) { /* ignore */ }
     } catch (error) {
       toast.error('Failed to load dashboard');
     } finally {
@@ -76,6 +85,31 @@ const Dashboard = () => {
             <span>Add Customer</span>
           </Link>
         </div>
+        {/* Share Group Khata Link */}
+        {groupToken && (
+          <div className="relative z-10 mt-4 flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                const link = `${window.location.origin}/group/${groupToken}`;
+                navigator.clipboard.writeText(link);
+                toast.success('Group Khata link copied!');
+              }}
+              className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-5 py-2.5 rounded-2xl font-semibold text-sm hover:bg-white/30 transition-all duration-200 border border-white/20"
+            >
+              <HiOutlineShare className="w-5 h-5" />
+              <span>Copy Group Khata Link</span>
+            </button>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent('Khata dekho: ' + window.location.origin + '/group/' + groupToken)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 bg-green-500/80 backdrop-blur-sm text-white px-5 py-2.5 rounded-2xl font-semibold text-sm hover:bg-green-500 transition-all duration-200"
+            >
+              <span>📱</span>
+              <span>Share on WhatsApp</span>
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Stats Cards */}

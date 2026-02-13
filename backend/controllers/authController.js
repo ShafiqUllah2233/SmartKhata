@@ -85,7 +85,8 @@ exports.getMe = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      groupShareToken: user.groupShareToken
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

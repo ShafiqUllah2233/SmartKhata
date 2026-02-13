@@ -98,16 +98,16 @@ const PublicKhata = () => {
             {/* Balance Summary */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Udhar Liya</p>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Given</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {(summary?.totalGiven || 0).toLocaleString()}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Wapas Diya</p>
+                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Received</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {(summary?.totalReceived || 0).toLocaleString()}</p>
               </div>
               <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center border border-white/20">
                 <p className="text-xs text-yellow-200 font-bold uppercase tracking-wider">
-                  {customer.balance > 0 ? 'Aap Par Baki Hai' : customer.balance < 0 ? 'Aapko Wapas Milna Hai' : 'Barabar Hai'}
+                  {customer.balance > 0 ? 'To Receive' : customer.balance < 0 ? 'To Pay' : 'Settled'}
                 </p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {Math.abs(customer.balance).toLocaleString()}</p>
               </div>
@@ -133,8 +133,8 @@ const PublicKhata = () => {
               <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer">
                 <option value="">All</option>
-                <option value="GIVEN">Udhar Liya</option>
-                <option value="RECEIVED">Wapas Diya</option>
+                <option value="GIVEN">Given</option>
+                <option value="RECEIVED">Received</option>
               </select>
             </div>
             <div className="flex gap-2">
@@ -156,8 +156,8 @@ const PublicKhata = () => {
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <HiOutlineCash className="w-10 h-10 text-gray-300" />
               </div>
-              <p className="text-gray-500 font-medium">Koi transaction nahi hai</p>
-              <p className="text-gray-400 text-sm mt-1">Jab transactions add hongi, yahan nazar aayengi</p>
+              <p className="text-gray-500 font-medium">No transactions yet</p>
+              <p className="text-gray-400 text-sm mt-1">Transactions will appear here once added</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-50">
@@ -174,7 +174,7 @@ const PublicKhata = () => {
                     </div>
                     <div className="min-w-0">
                       <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
-                        {tx.type === 'GIVEN' ? 'Udhar Liya' : 'Wapas Diya'}
+                        {tx.type === 'GIVEN' ? 'Given' : 'Received'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {format(new Date(tx.date), 'dd MMM yyyy')}

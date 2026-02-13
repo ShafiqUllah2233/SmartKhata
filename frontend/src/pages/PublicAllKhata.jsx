@@ -111,7 +111,7 @@ const PublicAllKhata = () => {
         <button onClick={() => { setSelectedCustomer(null); setCustomerDetail(null); }}
           className="flex items-center space-x-2 text-gray-400 hover:text-gray-700 mb-6 transition-colors font-medium text-sm group">
           <HiOutlineArrowLeft className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Wapas Sab Members</span>
+          <span>Back to All Members</span>
         </button>
 
         {/* Customer Info */}
@@ -130,16 +130,16 @@ const PublicAllKhata = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Udhar Liya</p>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Given</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.summary?.totalGiven || 0).toLocaleString()}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Wapas Diya</p>
+                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Received</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {(customerDetail.summary?.totalReceived || 0).toLocaleString()}</p>
               </div>
               <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center border border-white/20">
                 <p className="text-xs text-yellow-200 font-bold uppercase tracking-wider">
-                  {customerDetail.customer.balance > 0 ? 'Aap Par Baki Hai' : customerDetail.customer.balance < 0 ? 'Wapas Milna Hai' : 'Barabar Hai'}
+                  {customerDetail.customer.balance > 0 ? 'To Receive' : customerDetail.customer.balance < 0 ? 'To Pay' : 'Settled'}
                 </p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {Math.abs(customerDetail.customer.balance).toLocaleString()}</p>
               </div>
@@ -165,8 +165,8 @@ const PublicAllKhata = () => {
               <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer">
                 <option value="">All</option>
-                <option value="GIVEN">Udhar Liya</option>
-                <option value="RECEIVED">Wapas Diya</option>
+                <option value="GIVEN">Given</option>
+                <option value="RECEIVED">Received</option>
               </select>
             </div>
             <div className="flex gap-2">
@@ -188,7 +188,7 @@ const PublicAllKhata = () => {
               <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <HiOutlineCash className="w-10 h-10 text-gray-300" />
               </div>
-              <p className="text-gray-500 font-medium">Koi transaction nahi hai</p>
+              <p className="text-gray-500 font-medium">No transactions yet</p>
             </div>
           ) : (
             <div className="divide-y divide-gray-50">
@@ -205,7 +205,7 @@ const PublicAllKhata = () => {
                     </div>
                     <div className="min-w-0">
                       <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
-                        {tx.type === 'GIVEN' ? 'Udhar Liya' : 'Wapas Diya'}
+                        {tx.type === 'GIVEN' ? 'Given' : 'Received'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {format(new Date(tx.date), 'dd MMM yyyy')}
@@ -240,7 +240,7 @@ const PublicAllKhata = () => {
         <div className="max-w-4xl mx-auto flex items-center space-x-3">
           <span className="text-2xl">📒</span>
           <h1 className="text-xl font-bold text-white">Smart Khata</h1>
-          <span className="text-sm text-emerald-100/70 ml-2">- {data.ownerName} ka Khata</span>
+          <span className="text-sm text-emerald-100/70 ml-2">- {data.ownerName}'s Khata</span>
         </div>
       </div>
 
@@ -256,11 +256,11 @@ const PublicAllKhata = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Total Udhar</p>
+                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Total Given</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwed.toLocaleString()}</p>
               </div>
               <div className="bg-white/10 backdrop-blur rounded-2xl p-4 text-center border border-white/10">
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Total Wapas</p>
+                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Total Received</p>
                 <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwing.toLocaleString()}</p>
               </div>
               <div className="bg-white/15 backdrop-blur rounded-2xl p-4 text-center border border-white/20">
@@ -274,8 +274,8 @@ const PublicAllKhata = () => {
         {/* Customer List */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-100">
-            <h2 className="text-lg font-bold text-gray-800">👥 Sab Members</h2>
-            <p className="text-xs text-gray-400 mt-0.5">Kisi bhi member pe click karo, uska detail khata dikhega</p>
+            <h2 className="text-lg font-bold text-gray-800">👥 All Members</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Click on any member to view their detailed khata</p>
           </div>
 
           <div className="divide-y divide-gray-50">
@@ -297,11 +297,11 @@ const PublicAllKhata = () => {
                   </p>
                   <p className="text-xs font-medium mt-0.5">
                     {c.balance > 0 ? (
-                      <span className="text-rose-500">Udhar Baki ↗</span>
+                      <span className="text-rose-500">To Receive ↗</span>
                     ) : c.balance < 0 ? (
-                      <span className="text-emerald-500">Wapas Milna ↙</span>
+                      <span className="text-emerald-500">To Pay ↙</span>
                     ) : (
-                      <span className="text-gray-400">Barabar ✓</span>
+                      <span className="text-gray-400">Settled ✓</span>
                     )}
                   </p>
                 </div>

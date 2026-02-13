@@ -7,7 +7,8 @@ const {
   getCustomers,
   getCustomer,
   updateCustomer,
-  deleteCustomer
+  deleteCustomer,
+  getShareToken
 } = require('../controllers/customerController');
 
 router.use(protect);
@@ -24,5 +25,7 @@ router.route('/:id')
     body('name').notEmpty().withMessage('Customer name is required')
   ], updateCustomer)
   .delete(deleteCustomer);
+
+router.get('/:id/share', getShareToken);
 
 module.exports = router;

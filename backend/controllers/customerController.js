@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const Customer = require('../models/Customer');
 const Transaction = require('../models/Transaction');
+const crypto = require('crypto');
 
 // @desc    Create customer
 // @route   POST /api/customers
@@ -121,6 +122,31 @@ exports.deleteCustomer = async (req, res) => {
     await Customer.deleteOne({ _id: customer._id });
 
     res.json({ message: 'Customer and all transactions deleted' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Get share token for a customer
+// @route   GET /api/customers/:id/share
+exports.getShareToken = async (req, res) => {
+  try {
+    const customer = await Customer.findOne({
+      _id: req.params.id,
+      user: req.user._id
+    });
+
+    if (!customer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // If customer doesn't have a shareToken yet, generate one
+    if (!customer.shareToken) {
+      customer.shareToken = crypto.randomBytes(8).toString('hex');
+      await customer.save();
+    }
+
+    res.json({ shareToken: customer.shareToken });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

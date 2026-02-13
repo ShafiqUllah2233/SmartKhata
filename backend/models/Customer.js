@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 
 const customerSchema = new mongoose.Schema({
   user: {
@@ -26,6 +27,11 @@ const customerSchema = new mongoose.Schema({
     type: Number,
     default: 0
     // Positive = customer owes user, Negative = user owes customer
+  },
+  shareToken: {
+    type: String,
+    unique: true,
+    default: () => crypto.randomBytes(8).toString('hex')
   }
 }, {
   timestamps: true
@@ -34,5 +40,6 @@ const customerSchema = new mongoose.Schema({
 // Compound index for user + customer name uniqueness
 customerSchema.index({ user: 1, name: 1 });
 customerSchema.index({ user: 1, balance: 1 });
+customerSchema.index({ shareToken: 1 });
 
 module.exports = mongoose.model('Customer', customerSchema);

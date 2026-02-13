@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getTransactions, addTransaction, deleteTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV } from '../api';
+import { getTransactions, addTransaction, deleteTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV, getShareToken } from '../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import {
@@ -12,7 +12,9 @@ import {
   HiOutlineDownload,
   HiOutlineX,
   HiOutlineFilter,
-  HiOutlineCash
+  HiOutlineCash,
+  HiOutlineShare,
+  HiOutlineClipboardCopy
 } from 'react-icons/hi';
 
 const CustomerDetail = () => {
@@ -27,6 +29,8 @@ const CustomerDetail = () => {
   const [txForm, setTxForm] = useState({ amount: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
   const [txLoading, setTxLoading] = useState(false);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', type: '' });
+  const [shareLink, setShareLink] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -98,6 +102,22 @@ const CustomerDetail = () => {
 
   const clearFilters = () => { setFilters({ startDate: '', endDate: '', type: '' }); fetchData(); };
 
+  const handleShare = async () => {
+    try {
+      const { data } = await getShareToken(id);
+      const link = `${window.location.origin}/khata/${data.shareToken}`;
+      setShareLink(link);
+      setShowShareModal(true);
+    } catch (error) {
+      toast.error('Failed to get share link');
+    }
+  };
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    toast.success('Link copied! WhatsApp pe bhej do 📱');
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-[70vh]">
       <div className="text-center">
@@ -134,6 +154,7 @@ const CustomerDetail = () => {
               </div>
             </div>
             <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+              <button onClick={handleShare} className="p-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-xl transition-all border border-blue-400/20" title="Share Khata Link"><HiOutlineShare className="w-5 h-5" /></button>
               <button onClick={handleDownloadPDF} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10" title="PDF"><HiOutlineDocumentDownload className="w-5 h-5" /></button>
               <button onClick={handleDownloadCSV} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10" title="CSV"><HiOutlineDownload className="w-5 h-5" /></button>
               <Link to={'/customers/' + id + '/edit'} className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10" title="Edit"><HiOutlinePencil className="w-5 h-5" /></Link>
@@ -163,6 +184,40 @@ const CustomerDetail = () => {
 
       {/* Add Transaction Buttons */}
       <div className="flex gap-3 mb-6">
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowShareModal(false)}>
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🔗</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">Share Khata Link</h3>
+              <p className="text-sm text-gray-500 mt-2">Ye link {customer.name} ko bhejo. Wo bina login ke apna khata dekh sakta hai.</p>
+            </div>
+            <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+              <p className="text-xs text-gray-400 font-bold uppercase mb-2">Public Link</p>
+              <p className="text-sm text-gray-700 break-all font-mono">{shareLink}</p>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={copyShareLink}
+                className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-2xl font-bold hover:from-blue-600 hover:to-blue-700 transition-all">
+                <HiOutlineClipboardCopy className="w-5 h-5" />
+                <span>Copy Link</span>
+              </button>
+              <a href={`https://wa.me/?text=${encodeURIComponent(customer.name + ' ka Khata dekho: ' + shareLink)}`} target="_blank" rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-2xl font-bold hover:from-green-600 hover:to-green-700 transition-all">
+                <span>📱</span>
+                <span>WhatsApp</span>
+              </a>
+            </div>
+            <button onClick={() => setShowShareModal(false)} className="w-full mt-3 py-2.5 text-sm text-gray-400 hover:text-gray-600 font-medium transition-all">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
         <button onClick={() => { setTxType('GIVEN'); setShowAddForm(true); }}
           className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3.5 rounded-2xl font-bold hover:from-rose-600 hover:to-rose-700 transition-all shadow-lg shadow-rose-500/20 active:scale-[0.98]">
           <span className="text-lg">💸</span>

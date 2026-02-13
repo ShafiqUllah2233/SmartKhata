@@ -62,4 +62,7 @@ export const getAdminUsers = () => API.get('/admin/users');
 export const deleteAdminUser = (id) => API.delete(`/admin/users/${id}`);
 export const getAdminStats = () => API.get('/admin/stats');
 
+// Share
+export const getShareToken = (customerId) => API.get(`/customers/${customerId}/share`);
+
 export default API;

@@ -10,6 +10,7 @@ import CustomerList from './pages/CustomerList';
 import CustomerForm from './pages/CustomerForm';
 import CustomerDetail from './pages/CustomerDetail';
 import AdminPanel from './pages/AdminPanel';
+import PublicKhata from './pages/PublicKhata';
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ const AppRoutes = () => {
         <Route path="/customers/:id" element={<PrivateRoute><CustomerDetail /></PrivateRoute>} />
         <Route path="/customers/:id/edit" element={<PrivateRoute><CustomerForm /></PrivateRoute>} />
         <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
+        <Route path="/khata/:shareToken" element={<PublicKhata />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>

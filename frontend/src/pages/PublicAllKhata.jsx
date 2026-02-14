@@ -8,6 +8,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 import translations from '../translations';
 import shafiqImg from '../assets/shafiq.jpeg';
 import waseemImg from '../assets/waseem.jpeg';
+import faizanImg from '../assets/faizan.jpeg';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -20,6 +21,7 @@ const LANG_NAMES = { en: 'English', ur: 'اردو', ps: 'پښتو' };
 const PROFILE_IMAGES = {
   shafiq: shafiqImg,
   waseem: waseemImg,
+  faizan: faizanImg,
 };
 
 const PublicAllKhata = () => {

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
-import { HiOutlineCash, HiOutlineFilter } from 'react-icons/hi';
+import { HiOutlineCash } from 'react-icons/hi';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -14,6 +14,13 @@ const PublicKhata = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({ startDate: '', endDate: '', type: '' });
+  const [dark, setDark] = useState(() => localStorage.getItem('khata-dark') === 'true');
+
+  const toggleDark = () => {
+    const v = !dark;
+    setDark(v);
+    localStorage.setItem('khata-dark', String(v));
+  };
 
   useEffect(() => { fetchData(); }, [shareToken]);
 
@@ -48,33 +55,38 @@ const PublicKhata = () => {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className={`flex items-center justify-center min-h-screen ${dark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto"></div>
-        <p className="mt-4 text-gray-500 font-medium">Loading Khata...</p>
+        <p className={`mt-4 font-medium ${dark ? 'text-gray-400' : 'text-gray-500'}`}>Loading Khata...</p>
       </div>
     </div>
   );
 
   if (error) return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className={`flex items-center justify-center min-h-screen ${dark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="text-center px-6">
-        <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 ${dark ? 'bg-red-900/30' : 'bg-red-50'}`}>
           <span className="text-5xl">❌</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Khata Not Found</h1>
-        <p className="text-gray-500">This link is invalid or has expired.</p>
+        <h1 className={`text-2xl font-bold mb-2 ${dark ? 'text-gray-100' : 'text-gray-800'}`}>Khata Not Found</h1>
+        <p className={dark ? 'text-gray-400' : 'text-gray-500'}>This link is invalid or has expired.</p>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen transition-colors duration-300 ${dark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-4 shadow-lg">
-        <div className="max-w-4xl mx-auto flex items-center space-x-3">
-          <span className="text-2xl">📒</span>
-          <h1 className="text-xl font-bold text-white">Smart Khata</h1>
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl">📒</span>
+            <h1 className="text-xl font-bold text-white">Smart Khata</h1>
+          </div>
+          <button onClick={toggleDark} className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-all border border-white/10 flex items-center justify-center text-lg" title="Toggle Dark Mode">
+            {dark ? '☀️' : '🌙'}
+          </button>
         </div>
       </div>
 
@@ -110,67 +122,69 @@ const PublicKhata = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-6">
+        <div className={`rounded-3xl shadow-sm border p-4 sm:p-5 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
           <div className="flex flex-col sm:flex-row items-end gap-3">
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">From</label>
+              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>From</label>
               <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" />
+                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`} />
             </div>
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">To</label>
+              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>To</label>
               <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" />
+                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`} />
             </div>
             <div className="flex-1 w-full">
-              <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Type</label>
+              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>Type</label>
               <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer">
+                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`}>
                 <option value="">All</option>
-                <option value="GIVEN">Given</option>
-                <option value="RECEIVED">Received</option>
+                <option value="GIVEN">I Got</option>
+                <option value="RECEIVED">I Gave</option>
               </select>
             </div>
             <div className="flex gap-2">
               <button onClick={applyFilters} className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-sm">Filter</button>
-              <button onClick={clearFilters} className="px-4 py-2.5 bg-gray-100 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 transition-all">Clear</button>
+              <button onClick={clearFilters} className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${dark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>Clear</button>
             </div>
           </div>
         </div>
 
         {/* Transaction History */}
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100">
-            <h2 className="text-lg font-bold text-gray-800">Transaction History</h2>
-            <p className="text-xs text-gray-400 mt-0.5">{transactions.length} transactions</p>
+        <div className={`rounded-3xl shadow-sm border overflow-hidden transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+          <div className={`px-6 py-5 border-b ${dark ? 'border-gray-700' : 'border-gray-100'}`}>
+            <h2 className={`text-lg font-bold ${dark ? 'text-gray-100' : 'text-gray-800'}`}>Transaction History</h2>
+            <p className={`text-xs mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>{transactions.length} transactions</p>
           </div>
 
           {transactions.length === 0 ? (
             <div className="px-6 py-16 text-center">
-              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <HiOutlineCash className="w-10 h-10 text-gray-300" />
+              <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${dark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                <HiOutlineCash className={`w-10 h-10 ${dark ? 'text-gray-500' : 'text-gray-300'}`} />
               </div>
-              <p className="text-gray-500 font-medium">No transactions yet</p>
-              <p className="text-gray-400 text-sm mt-1">Transactions will appear here once added</p>
+              <p className={`font-medium ${dark ? 'text-gray-400' : 'text-gray-500'}`}>No transactions yet</p>
+              <p className={`text-sm mt-1 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>Transactions will appear here once added</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-50">
+            <div className={`divide-y ${dark ? 'divide-gray-700' : 'divide-gray-50'}`}>
               {transactions.map((tx) => (
                 <div key={tx._id}
                   className={`flex items-center justify-between px-6 py-4 border-l-4 transition-all ${
                     tx.type === 'GIVEN' ? 'border-l-rose-500' : 'border-l-emerald-500'
-                  }`}>
+                  } ${dark ? 'hover:bg-gray-700/50' : 'hover:bg-gray-50/50'}`}>
                   <div className="flex items-center space-x-4 min-w-0">
                     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 ${
-                      tx.type === 'GIVEN' ? 'bg-rose-50' : 'bg-emerald-50'
+                      tx.type === 'GIVEN'
+                        ? (dark ? 'bg-rose-900/30' : 'bg-rose-50')
+                        : (dark ? 'bg-emerald-900/30' : 'bg-emerald-50')
                     }`}>
                       {tx.type === 'GIVEN' ? '💸' : '💰'}
                     </div>
                     <div className="min-w-0">
-                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
+                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? (dark ? 'text-rose-400' : 'text-rose-700') : (dark ? 'text-emerald-400' : 'text-emerald-700')}`}>
                         {tx.type === 'GIVEN' ? 'I Got' : 'I Gave'}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5">
+                      <p className={`text-xs mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>
                         {format(new Date(tx.date), 'dd MMM yyyy')}
                         {tx.description && (' · ' + tx.description)}
                       </p>
@@ -180,7 +194,7 @@ const PublicKhata = () => {
                     <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-rose-600' : 'text-emerald-600'}`}>
                       {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
                     </p>
-                    <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
+                    <p className={`text-xs font-medium ${dark ? 'text-gray-500' : 'text-gray-400'}`}>Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
                   </div>
                 </div>
               ))}
@@ -190,7 +204,7 @@ const PublicKhata = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 pb-6">
-          <p className="text-xs text-gray-400">📒 Powered By Shafiq Ullah Khan</p>
+          <p className={`text-xs ${dark ? 'text-gray-600' : 'text-gray-400'}`}>📒 Powered By Shafiq Ullah Khan</p>
         </div>
       </div>
     </div>

@@ -249,6 +249,79 @@ exports.deleteTransaction = async (req, res) => {
   }
 };
 
+// @desc    Edit a transaction (amount, description, type, date)
+// @route   PUT /api/transactions/:id
+exports.editTransaction = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const transaction = await Transaction.findOne({
+      _id: req.params.id,
+      user: req.user._id
+    });
+
+    if (!transaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    const customer = await Customer.findById(transaction.customer);
+    const { amount, description, type, date } = req.body;
+
+    // Reverse old transaction effect on customer balance
+    if (transaction.type === 'GIVEN') {
+      customer.balance -= transaction.amount;
+    } else {
+      customer.balance += transaction.amount;
+    }
+
+    // Update transaction fields
+    const newType = type || transaction.type;
+    const newAmount = amount !== undefined ? parseFloat(amount) : transaction.amount;
+    transaction.type = newType;
+    transaction.amount = newAmount;
+    if (description !== undefined) transaction.description = description;
+    if (date) transaction.date = new Date(date);
+
+    // Apply new transaction effect
+    if (newType === 'GIVEN') {
+      customer.balance += newAmount;
+    } else {
+      customer.balance -= newAmount;
+    }
+
+    await customer.save();
+
+    // Recalculate balanceAfter for this and all subsequent transactions
+    const allTransactions = await Transaction.find({
+      customer: transaction.customer
+    }).sort({ date: 1, createdAt: 1 });
+
+    let runningBalance = 0;
+    for (const t of allTransactions) {
+      if (t.type === 'GIVEN') {
+        runningBalance += t.amount;
+      } else {
+        runningBalance -= t.amount;
+      }
+      if (t._id.toString() === transaction._id.toString()) {
+        transaction.balanceAfter = runningBalance;
+      } else {
+        t.balanceAfter = runningBalance;
+        await t.save();
+      }
+    }
+
+    await transaction.save();
+
+    res.json(transaction);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // @desc    Reply to a viewer note
 // @route   PUT /api/transactions/notes/:noteId/reply
 exports.replyToNote = async (req, res) => {

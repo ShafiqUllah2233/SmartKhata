@@ -45,6 +45,7 @@ export const getTransactions = (customerId, params) =>
 export const addTransaction = (customerId, data) =>
   API.post(`/customers/${customerId}/transactions`, data);
 export const deleteTransaction = (id) => API.delete(`/transactions/${id}`);
+export const editTransaction = (id, data) => API.put(`/transactions/${id}`, data);
 export const addSharedExpense = (data) => API.post('/transactions/shared-expense', data);
 export const replyToNote = (noteId, data) => API.put(`/transactions/notes/${noteId}/reply`, data);
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getTransactions, addTransaction, deleteTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV, getShareToken, replyToNote } from '../api';
+import { getTransactions, addTransaction, deleteTransaction, editTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV, getShareToken, replyToNote } from '../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import {
@@ -39,6 +39,9 @@ const CustomerDetail = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
+  const [editingTx, setEditingTx] = useState(null);
+  const [editForm, setEditForm] = useState({ amount: '', description: '', type: '', date: '' });
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -72,6 +75,37 @@ const CustomerDetail = () => {
     if (!window.confirm('Delete this transaction?')) return;
     try { await deleteTransaction(txId); toast.success('Transaction deleted'); fetchData(); }
     catch (error) { toast.error('Failed to delete transaction'); }
+  };
+
+  const startEditTransaction = (tx) => {
+    setEditingTx(tx._id);
+    setEditForm({
+      amount: tx.amount.toString(),
+      description: tx.description || '',
+      type: tx.type,
+      date: format(new Date(tx.date), 'yyyy-MM-dd')
+    });
+  };
+
+  const handleEditTransaction = async (e) => {
+    e.preventDefault();
+    if (!editForm.amount || parseFloat(editForm.amount) <= 0) return toast.error('Enter a valid amount');
+    setEditLoading(true);
+    try {
+      await editTransaction(editingTx, {
+        amount: parseFloat(editForm.amount),
+        description: editForm.description,
+        type: editForm.type,
+        date: editForm.date
+      });
+      toast.success('Transaction updated!');
+      setEditingTx(null);
+      fetchData();
+    } catch (error) {
+      toast.error('Failed to update transaction');
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const handleDeleteCustomer = async () => {
@@ -385,12 +419,71 @@ const CustomerDetail = () => {
                       </p>
                       <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
                     </div>
-                    <button onClick={() => handleDeleteTransaction(tx._id)}
-                      className="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                      <HiOutlineTrash className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center space-x-1">
+                      <button onClick={() => startEditTransaction(tx)}
+                        className="p-2 text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Edit">
+                        <HiOutlinePencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDeleteTransaction(tx._id)}
+                        className="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all" title="Delete">
+                        <HiOutlineTrash className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                {/* Inline Edit Form */}
+                {editingTx === tx._id && (
+                  <div className="px-6 pb-4 bg-amber-50/50 border-l-4 border-l-amber-400">
+                    <form onSubmit={handleEditTransaction} className="pt-3 space-y-3">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className="text-sm font-bold text-amber-700">✏️ Edit Transaction</span>
+                        <button type="button" onClick={() => setEditingTx(null)} className="ml-auto text-gray-400 hover:text-gray-600">
+                          <HiOutlineX className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Type</label>
+                          <select value={editForm.type} onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
+                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
+                            <option value="GIVEN">I Gave</option>
+                            <option value="RECEIVED">I Got</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Amount (Rs.)</label>
+                          <input type="number" min="0.01" step="0.01" value={editForm.amount}
+                            onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Date</label>
+                          <input type="date" value={editForm.date}
+                            onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Description</label>
+                          <input type="text" value={editForm.description}
+                            onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                            className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none"
+                            placeholder="Optional" />
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button type="submit" disabled={editLoading}
+                          className="px-5 py-2 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600 transition-all disabled:opacity-50">
+                          {editLoading ? 'Saving...' : '✅ Save Changes'}
+                        </button>
+                        <button type="button" onClick={() => setEditingTx(null)}
+                          className="px-4 py-2 bg-gray-100 text-gray-500 text-sm font-semibold rounded-xl hover:bg-gray-200 transition-all">
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
                 {/* Expanded Viewer Notes */}
                 {expandedNotes[tx._id] && tx.viewerNotes && tx.viewerNotes.length > 0 && (
                   <div className="px-6 pb-4 bg-blue-50/30 border-l-4 border-l-blue-400">

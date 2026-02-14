@@ -14,6 +14,11 @@ const API_URL = import.meta.env.VITE_API_URL || '/api';
 const LANG_FLAGS = { en: '🇬🇧', ur: '🇵🇰', ps: '🏔️' };
 const LANG_NAMES = { en: 'English', ur: 'اردو', ps: 'پښتو' };
 
+// Map customer names (lowercase) to their profile images
+const PROFILE_IMAGES = {
+  shafiq: '/shafiq.jpeg',
+};
+
 const PublicAllKhata = () => {
   const { groupToken } = useParams();
   const navigate = useNavigate();
@@ -245,9 +250,17 @@ const PublicAllKhata = () => {
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-20 translate-x-20"></div>
           <div className="relative z-10">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-white font-extrabold text-2xl border border-white/20">
-                {customerDetail.customer.name.charAt(0).toUpperCase()}
-              </div>
+              {PROFILE_IMAGES[customerDetail.customer.name.toLowerCase()] ? (
+                <img
+                  src={PROFILE_IMAGES[customerDetail.customer.name.toLowerCase()]}
+                  alt={customerDetail.customer.name}
+                  className="w-16 h-16 rounded-2xl object-cover border-2 border-white/30 shadow-lg"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-white font-extrabold text-2xl border border-white/20">
+                  {customerDetail.customer.name.charAt(0).toUpperCase()}
+                </div>
+              )}
               <div>
                 <h1 className="text-2xl sm:text-3xl font-extrabold text-white">{customerDetail.customer.name}</h1>
                 <p className="text-sm text-emerald-100/70 mt-1">📒 {t.khataDetail}</p>
@@ -648,9 +661,17 @@ const PublicAllKhata = () => {
               <button key={c.shareToken} onClick={() => openCustomerDetail(c.shareToken)}
                 className={`w-full flex items-center justify-between px-6 py-4 transition-all text-left group ${dark ? 'hover:bg-gray-700/80' : 'hover:bg-gray-50/80'}`}>
                 <div className="flex items-center space-x-4 min-w-0">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-extrabold text-lg flex-shrink-0 shadow-sm">
-                    {c.name.charAt(0).toUpperCase()}
-                  </div>
+                  {PROFILE_IMAGES[c.name.toLowerCase()] ? (
+                    <img
+                      src={PROFILE_IMAGES[c.name.toLowerCase()]}
+                      alt={c.name}
+                      className="w-12 h-12 rounded-2xl object-cover flex-shrink-0 shadow-sm border-2 border-emerald-500"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-extrabold text-lg flex-shrink-0 shadow-sm">
+                      {c.name.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                   <div className="min-w-0">
                     <p className={`font-bold group-hover:text-emerald-700 transition-colors ${dark ? 'text-gray-100' : 'text-gray-800'}`}>{c.name}</p>
                     {c.phone && <p className={`text-xs mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>📱 {c.phone}</p>}

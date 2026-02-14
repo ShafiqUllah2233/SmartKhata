@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import translations from '../translations';
+import shafiqImg from '../assets/shafiq.jpeg';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -16,7 +17,7 @@ const LANG_NAMES = { en: 'English', ur: 'اردو', ps: 'پښتو' };
 
 // Map customer names (lowercase) to their profile images
 const PROFILE_IMAGES = {
-  shafiq: '/shafiq.jpeg',
+  shafiq: shafiqImg,
 };
 
 const PublicAllKhata = () => {

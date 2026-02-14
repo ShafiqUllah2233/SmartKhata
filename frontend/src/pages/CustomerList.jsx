@@ -166,75 +166,78 @@ const CustomerList = () => {
             {customers.map((customer) => (
               <div
                 key={customer._id}
-                className="flex items-center justify-between px-5 sm:px-6 py-4 hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-transparent transition-all duration-200 cursor-pointer group"
+                className="px-4 sm:px-6 py-4 hover:bg-gradient-to-r hover:from-gray-50/80 hover:to-transparent transition-all duration-200 cursor-pointer group"
                 onClick={() => navigate(`/customers/${customer._id}`)}
               >
-                <div className="flex items-center space-x-4 min-w-0">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-emerald-500/20 group-hover:shadow-md group-hover:shadow-emerald-500/25 transition-all flex-shrink-0">
-                    {customer.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-bold text-gray-800 truncate group-hover:text-emerald-700 transition-colors">{customer.name}</p>
-                    <p className="text-sm text-gray-400">
-                      {customer.phone || 'No phone'}
-                      {customer.address ? ` · ${customer.address}` : ''}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4 flex-shrink-0">
-                  <div className="text-right">
-                    <p className={`font-extrabold text-lg ${
-                      customer.balance > 0
-                        ? 'text-rose-600'
-                        : customer.balance < 0
-                        ? 'text-emerald-600'
-                        : 'text-gray-400'
-                    }`}>
-                      Rs. {Math.abs(customer.balance).toLocaleString()}
-                    </p>
-                    <div className="flex items-center justify-end space-x-1.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        customer.balance > 0
-                          ? 'bg-rose-500 animate-pulse-dot'
-                          : customer.balance < 0
-                          ? 'bg-emerald-500 animate-pulse-dot'
-                          : 'bg-gray-300'
-                      }`}></span>
-                      <p className={`text-xs font-semibold ${
-                        customer.balance > 0
-                          ? 'text-rose-400'
-                          : customer.balance < 0
-                          ? 'text-emerald-400'
-                          : 'text-gray-400'
-                      }`}>
-                        {customer.balance > 0
-                          ? 'Maine Lene Hain'
-                          : customer.balance < 0
-                          ? 'Maine Dene Hain'
-                          : 'Settled'}
+                {/* Mobile: stacked layout, Desktop: row layout */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-sm shadow-emerald-500/20 group-hover:shadow-md group-hover:shadow-emerald-500/25 transition-all flex-shrink-0">
+                      {customer.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-gray-800 truncate group-hover:text-emerald-700 transition-colors text-sm sm:text-base">{customer.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-400 truncate">
+                        {customer.phone || 'No phone'}
+                        {customer.address ? ` · ${customer.address}` : ''}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => navigate(`/customers/${customer._id}/edit`)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                      title="Edit"
-                    >
-                      <HiOutlinePencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(customer._id, customer.name)}
-                      className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
-                      title="Delete"
-                    >
-                      <HiOutlineTrash className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0 ml-2">
+                    <div className="text-right">
+                      <p className={`font-extrabold text-base sm:text-lg ${
+                        customer.balance > 0
+                          ? 'text-rose-600'
+                          : customer.balance < 0
+                          ? 'text-emerald-600'
+                          : 'text-gray-400'
+                      }`}>
+                        Rs. {Math.abs(customer.balance).toLocaleString()}
+                      </p>
+                      <div className="flex items-center justify-end space-x-1">
+                        <span className={`w-1.5 h-1.5 rounded-full ${
+                          customer.balance > 0
+                            ? 'bg-rose-500 animate-pulse-dot'
+                            : customer.balance < 0
+                            ? 'bg-emerald-500 animate-pulse-dot'
+                            : 'bg-gray-300'
+                        }`}></span>
+                        <p className={`text-[10px] sm:text-xs font-semibold whitespace-nowrap ${
+                          customer.balance > 0
+                            ? 'text-rose-400'
+                            : customer.balance < 0
+                            ? 'text-emerald-400'
+                            : 'text-gray-400'
+                        }`}>
+                          {customer.balance > 0
+                            ? 'Maine Lene Hain'
+                            : customer.balance < 0
+                            ? 'Maine Dene Hain'
+                            : 'Settled'}
+                        </p>
+                      </div>
+                    </div>
 
-                  <HiOutlineArrowRight className="w-4 h-4 text-gray-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all" />
+                    <div className="hidden sm:flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => navigate(`/customers/${customer._id}/edit`)}
+                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                        title="Edit"
+                      >
+                        <HiOutlinePencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(customer._id, customer.name)}
+                        className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                        title="Delete"
+                      >
+                        <HiOutlineTrash className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <HiOutlineArrowRight className="w-4 h-4 text-gray-300 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-all hidden sm:block" />
+                  </div>
                 </div>
               </div>
             ))}

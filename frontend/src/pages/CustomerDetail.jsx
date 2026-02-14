@@ -63,7 +63,7 @@ const CustomerDetail = () => {
     setTxLoading(true);
     try {
       await addTransaction(id, { type: txType, amount: parseFloat(txForm.amount), description: txForm.description, date: txForm.date });
-      toast.success(txType === 'GIVEN' ? 'Money Given recorded' : 'Money Received recorded');
+      toast.success(txType === 'GIVEN' ? 'Paise diye record hogaye' : 'Paise liye record hogaye');
       setShowAddForm(false);
       setTxForm({ amount: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
       fetchData();
@@ -273,12 +273,12 @@ const CustomerDetail = () => {
         <button onClick={() => { setTxType('GIVEN'); setShowAddForm(true); }}
           className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-rose-500 to-rose-600 text-white py-3.5 rounded-2xl font-bold hover:from-rose-600 hover:to-rose-700 transition-all shadow-lg shadow-rose-500/20 active:scale-[0.98]">
           <span className="text-lg">💸</span>
-          <span>Money Given</span>
+          <span>Maine Diye</span>
         </button>
         <button onClick={() => { setTxType('RECEIVED'); setShowAddForm(true); }}
           className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3.5 rounded-2xl font-bold hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]">
           <span className="text-lg">💰</span>
-          <span>Money Received</span>
+          <span>Maine Liye</span>
         </button>
       </div>
 
@@ -291,7 +291,7 @@ const CustomerDetail = () => {
                 {txType === 'GIVEN' ? '💸' : '💰'}
               </div>
               <h3 className={`text-lg font-bold ${txType === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
-                {txType === 'GIVEN' ? 'Record Money Given' : 'Record Money Received'}
+                {txType === 'GIVEN' ? 'Maine Diye (Expense)' : 'Maine Liye (Income)'}
               </h3>
             </div>
             <button onClick={() => setShowAddForm(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all">
@@ -327,7 +327,7 @@ const CustomerDetail = () => {
                   ? 'bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 shadow-rose-500/20'
                   : 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/20'
               }`}>
-              {txLoading ? 'Saving...' : txType === 'GIVEN' ? 'Record Money Given' : 'Record Money Received'}
+              {txLoading ? 'Saving...' : txType === 'GIVEN' ? 'Maine Diye - Save' : 'Maine Liye - Save'}
             </button>
           </form>
         </div>
@@ -351,8 +351,8 @@ const CustomerDetail = () => {
             <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
               className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer">
               <option value="">All</option>
-              <option value="GIVEN">Money Given</option>
-              <option value="RECEIVED">Money Received</option>
+              <option value="GIVEN">Maine Diye</option>
+              <option value="RECEIVED">Maine Liye</option>
             </select>
           </div>
           <div className="flex gap-2">
@@ -383,17 +383,17 @@ const CustomerDetail = () => {
               <div key={tx._id}>
                 <div
                   className={`flex items-center justify-between px-6 py-4 border-l-4 transition-all hover:bg-gray-50/50 ${
-                    tx.type === 'GIVEN' ? 'border-l-emerald-500' : 'border-l-rose-500'
+                    tx.type === 'GIVEN' ? 'border-l-rose-500' : 'border-l-emerald-500'
                   }`}>
                   <div className="flex items-center space-x-4 min-w-0">
                     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 ${
-                      tx.type === 'GIVEN' ? 'bg-emerald-50' : 'bg-rose-50'
+                      tx.type === 'GIVEN' ? 'bg-rose-50' : 'bg-emerald-50'
                     }`}>
                       {tx.type === 'GIVEN' ? '💸' : '💰'}
                     </div>
                     <div className="min-w-0">
-                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-emerald-700' : 'text-rose-700'}`}>
-                        {tx.type === 'GIVEN' ? 'I Gave' : 'I Got'}
+                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
+                        {tx.type === 'GIVEN' ? 'Maine Diye' : 'Maine Liye'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {format(new Date(tx.date), 'dd MMM yyyy')}
@@ -414,8 +414,8 @@ const CustomerDetail = () => {
                   </div>
                   <div className="flex items-center space-x-4 flex-shrink-0">
                     <div className="text-right">
-                      <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
+                      <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                        {tx.type === 'GIVEN' ? '−' : '+'} Rs. {tx.amount.toLocaleString()}
                       </p>
                       <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
                     </div>
@@ -447,8 +447,8 @@ const CustomerDetail = () => {
                           <label className="block text-xs font-bold text-gray-500 mb-1">Type</label>
                           <select value={editForm.type} onChange={(e) => setEditForm({ ...editForm, type: e.target.value })}
                             className="w-full px-3 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 outline-none">
-                            <option value="GIVEN">I Gave</option>
-                            <option value="RECEIVED">I Got</option>
+                            <option value="GIVEN">Maine Diye</option>
+                            <option value="RECEIVED">Maine Liye</option>
                           </select>
                         </div>
                         <div>

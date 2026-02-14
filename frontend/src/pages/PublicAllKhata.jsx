@@ -6,7 +6,6 @@ import axios from 'axios';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import translations from '../translations';
-import asadImg from '../assets/asad.jpg';
 import shafiqImg from '../assets/shafiq.jpeg';
 import waseemImg from '../assets/waseem.jpeg';
 import faizanImg from '../assets/faizan.jpeg';
@@ -26,7 +25,6 @@ const PROFILE_IMAGES = {
   waseem: waseemImg,
   faizan: faizanImg,
   abdullah: abdullahImg,
-  asad: asadImg,
 };
 
 const PublicAllKhata = () => {

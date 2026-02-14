@@ -1,6 +1,7 @@
 const { validationResult } = require('express-validator');
 const Transaction = require('../models/Transaction');
 const Customer = require('../models/Customer');
+const ViewerNote = require('../models/ViewerNote');
 
 // @desc    Add transaction (GIVEN or RECEIVED)
 // @route   POST /api/customers/:customerId/transactions
@@ -85,9 +86,28 @@ exports.getTransactions = async (req, res) => {
 
     const transactions = await Transaction.find(query).sort({ date: -1, createdAt: -1 });
 
+    // Fetch viewer notes for these transactions
+    const txIds = transactions.map(t => t._id);
+    const notes = await ViewerNote.find({ transaction: { $in: txIds } }).sort({ createdAt: -1 });
+
+    // Group notes by transaction ID
+    const notesByTx = {};
+    notes.forEach(n => {
+      const key = n.transaction.toString();
+      if (!notesByTx[key]) notesByTx[key] = [];
+      notesByTx[key].push(n);
+    });
+
+    // Attach notes to transactions
+    const transactionsWithNotes = transactions.map(t => {
+      const obj = t.toObject();
+      obj.viewerNotes = notesByTx[t._id.toString()] || [];
+      return obj;
+    });
+
     res.json({
       customer,
-      transactions,
+      transactions: transactionsWithNotes,
       summary: {
         totalGiven: transactions
           .filter(t => t.type === 'GIVEN')

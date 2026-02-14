@@ -14,7 +14,10 @@ import {
   HiOutlineFilter,
   HiOutlineCash,
   HiOutlineShare,
-  HiOutlineClipboardCopy
+  HiOutlineClipboardCopy,
+  HiOutlineChatAlt2,
+  HiOutlineEye,
+  HiOutlineEyeOff
 } from 'react-icons/hi';
 
 const CustomerDetail = () => {
@@ -31,6 +34,7 @@ const CustomerDetail = () => {
   const [filters, setFilters] = useState({ startDate: '', endDate: '', type: '' });
   const [shareLink, setShareLink] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [expandedNotes, setExpandedNotes] = useState({});
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -322,38 +326,74 @@ const CustomerDetail = () => {
         ) : (
           <div className="divide-y divide-gray-50 stagger-children">
             {transactions.map((tx) => (
-              <div key={tx._id}
-                className={`flex items-center justify-between px-6 py-4 border-l-4 transition-all hover:bg-gray-50/50 ${
-                  tx.type === 'GIVEN' ? 'border-l-emerald-500' : 'border-l-rose-500'
-                }`}>
-                <div className="flex items-center space-x-4 min-w-0">
-                  <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 ${
-                    tx.type === 'GIVEN' ? 'bg-emerald-50' : 'bg-rose-50'
+              <div key={tx._id}>
+                <div
+                  className={`flex items-center justify-between px-6 py-4 border-l-4 transition-all hover:bg-gray-50/50 ${
+                    tx.type === 'GIVEN' ? 'border-l-emerald-500' : 'border-l-rose-500'
                   }`}>
-                    {tx.type === 'GIVEN' ? '💸' : '💰'}
+                  <div className="flex items-center space-x-4 min-w-0">
+                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 ${
+                      tx.type === 'GIVEN' ? 'bg-emerald-50' : 'bg-rose-50'
+                    }`}>
+                      {tx.type === 'GIVEN' ? '💸' : '💰'}
+                    </div>
+                    <div className="min-w-0">
+                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {tx.type === 'GIVEN' ? 'I Gave' : 'I Got'}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {format(new Date(tx.date), 'dd MMM yyyy')}
+                        {tx.description && (' · ' + tx.description)}
+                      </p>
+                      {/* Viewer Notes Toggle */}
+                      {tx.viewerNotes && tx.viewerNotes.length > 0 && (
+                        <button
+                          onClick={() => setExpandedNotes(prev => ({ ...prev, [tx._id]: !prev[tx._id] }))}
+                          className="flex items-center space-x-1 mt-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                        >
+                          {expandedNotes[tx._id] ? <HiOutlineEyeOff className="w-3.5 h-3.5" /> : <HiOutlineEye className="w-3.5 h-3.5" />}
+                          <HiOutlineChatAlt2 className="w-3.5 h-3.5" />
+                          <span>{expandedNotes[tx._id] ? 'Hide' : 'Show'} Notes ({tx.viewerNotes.length})</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-emerald-700' : 'text-rose-700'}`}>
-                      {tx.type === 'GIVEN' ? 'I Gave' : 'I Got'}
-                    </p>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {format(new Date(tx.date), 'dd MMM yyyy')}
-                      {tx.description && (' · ' + tx.description)}
-                    </p>
+                  <div className="flex items-center space-x-4 flex-shrink-0">
+                    <div className="text-right">
+                      <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
+                    </div>
+                    <button onClick={() => handleDeleteTransaction(tx._id)}
+                      className="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                      <HiOutlineTrash className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-                <div className="flex items-center space-x-4 flex-shrink-0">
-                  <div className="text-right">
-                    <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
-                    </p>
-                    <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>
+                {/* Expanded Viewer Notes */}
+                {expandedNotes[tx._id] && tx.viewerNotes && tx.viewerNotes.length > 0 && (
+                  <div className="px-6 pb-4 bg-blue-50/30 border-l-4 border-l-blue-400">
+                    <div className="space-y-2 pt-2">
+                      {tx.viewerNotes.map((note, idx) => (
+                        <div key={idx} className="flex items-start space-x-3 bg-white rounded-xl p-3 border border-blue-100 shadow-sm">
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
+                            {note.viewerName ? note.viewerName.charAt(0).toUpperCase() : '?'}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="font-bold text-sm text-gray-800">{note.viewerName || 'Anonymous'}</span>
+                              <span className="text-xs text-gray-400">
+                                {format(new Date(note.createdAt), 'dd MMM yyyy, hh:mm a')}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600 mt-0.5">{note.note}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <button onClick={() => handleDeleteTransaction(tx._id)}
-                    className="p-2 text-gray-300 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                    <HiOutlineTrash className="w-4 h-4" />
-                  </button>
-                </div>
+                )}
               </div>
             ))}
           </div>

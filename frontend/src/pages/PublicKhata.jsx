@@ -158,17 +158,17 @@ const PublicKhata = () => {
               {transactions.map((tx) => (
                 <div key={tx._id}
                   className={`flex items-center justify-between px-6 py-4 border-l-4 transition-all ${
-                    tx.type === 'GIVEN' ? 'border-l-rose-500' : 'border-l-emerald-500'
+                    tx.type === 'GIVEN' ? 'border-l-emerald-500' : 'border-l-rose-500'
                   }`}>
                   <div className="flex items-center space-x-4 min-w-0">
                     <div className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg flex-shrink-0 ${
-                      tx.type === 'GIVEN' ? 'bg-rose-50' : 'bg-emerald-50'
+                      tx.type === 'GIVEN' ? 'bg-emerald-50' : 'bg-rose-50'
                     }`}>
                       {tx.type === 'GIVEN' ? '💸' : '💰'}
                     </div>
                     <div className="min-w-0">
-                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-rose-700' : 'text-emerald-700'}`}>
-                        {tx.type === 'GIVEN' ? 'Given' : 'Received'}
+                      <p className={`font-bold text-sm ${tx.type === 'GIVEN' ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        {tx.type === 'GIVEN' ? 'I Gave' : 'I Got'}
                       </p>
                       <p className="text-xs text-gray-400 mt-0.5">
                         {format(new Date(tx.date), 'dd MMM yyyy')}
@@ -177,7 +177,7 @@ const PublicKhata = () => {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    <p className={`font-extrabold text-lg ${tx.type === 'GIVEN' ? 'text-emerald-600' : 'text-rose-600'}`}>
                       {tx.type === 'GIVEN' ? '-' : '+'} Rs. {tx.amount.toLocaleString()}
                     </p>
                     <p className="text-xs text-gray-400 font-medium">Bal: Rs. {tx.balanceAfter.toLocaleString()}</p>

@@ -76,6 +76,18 @@ exports.getGroupKhata = async (req, res) => {
     const totalOwed = customers.reduce((sum, c) => sum + (c.balance > 0 ? c.balance : 0), 0);
     const totalOwing = customers.reduce((sum, c) => sum + (c.balance < 0 ? Math.abs(c.balance) : 0), 0);
 
+    // Calculate monthly total expense (all RECEIVED transactions this month across all customers)
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    const customerIds = customers.map(c => c._id);
+    const monthlyReceivedTxns = await Transaction.find({
+      customer: { $in: customerIds },
+      type: 'RECEIVED',
+      date: { $gte: monthStart, $lte: monthEnd }
+    }).select('amount');
+    const monthlyTotalExpense = monthlyReceivedTxns.reduce((sum, t) => sum + t.amount, 0);
+
     res.json({
       ownerName: user.name,
       customers: customers.map(c => ({
@@ -89,7 +101,9 @@ exports.getGroupKhata = async (req, res) => {
         totalCustomers: customers.length,
         totalOwed,
         totalOwing,
-        netBalance: totalOwed - totalOwing
+        netBalance: totalOwed - totalOwing,
+        monthlyTotalExpense,
+        currentMonth: now.toLocaleString('default', { month: 'long', year: 'numeric' })
       }
     });
   } catch (error) {

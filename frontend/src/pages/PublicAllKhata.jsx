@@ -338,15 +338,10 @@ const PublicAllKhata = () => {
             <h2 className="text-xl font-bold text-white mb-1">📊 Overall Summary</h2>
             <p className="text-sm text-emerald-100/70 mb-5">{data.summary.totalCustomers} Members</p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${data.summary.totalOwed > 0 ? 'bg-emerald-500/20 border-emerald-300/30' : 'bg-white/10 border-white/10'}`}>
-                <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Maine Lene Hain</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwed.toLocaleString()}</p>
-              </div>
-              <div className={`backdrop-blur rounded-2xl p-4 text-center border ${data.summary.totalOwing > 0 ? 'bg-rose-500/20 border-rose-300/30' : 'bg-white/10 border-white/10'}`}>
-                <p className="text-xs text-red-200 font-bold uppercase tracking-wider">Maine Dene Hain</p>
-                <p className="text-2xl font-extrabold text-white mt-1">Rs. {data.summary.totalOwing.toLocaleString()}</p>
-              </div>
+            <div className="backdrop-blur rounded-2xl p-5 text-center border bg-emerald-500/20 border-emerald-300/30">
+              <p className="text-xs text-green-200 font-bold uppercase tracking-wider">Total Expense</p>
+              <p className="text-sm text-emerald-100/60 mt-1">{data.summary.currentMonth}</p>
+              <p className="text-3xl font-extrabold text-white mt-2">Rs. {data.summary.monthlyTotalExpense.toLocaleString()}</p>
             </div>
           </div>
         </div>

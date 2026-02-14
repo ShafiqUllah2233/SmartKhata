@@ -69,4 +69,11 @@ export const getAdminStats = () => API.get('/admin/stats');
 // Share
 export const getShareToken = (customerId) => API.get(`/customers/${customerId}/share`);
 
+// Notifications
+export const getNotifications = (params) => API.get('/notifications', { params });
+export const getUnreadCount = () => API.get('/notifications/unread-count');
+export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`);
+export const markAllNotificationsRead = () => API.put('/notifications/read-all');
+export const deleteNotification = (id) => API.delete(`/notifications/${id}`);
+
 export default API;

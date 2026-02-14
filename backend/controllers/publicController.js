@@ -2,6 +2,7 @@ const Customer = require('../models/Customer');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
 const ViewerNote = require('../models/ViewerNote');
+const Notification = require('../models/Notification');
 
 // @desc    Get public khata by share token (NO LOGIN REQUIRED)
 // @route   GET /api/public/khata/:shareToken
@@ -127,6 +128,21 @@ exports.addViewerNote = async (req, res) => {
       viewerName: viewerName.trim(),
       note: note.trim()
     });
+
+    // Create notification for the customer's owner (admin)
+    try {
+      await Notification.create({
+        user: customer.user,
+        type: 'VIEWER_NOTE',
+        message: `${viewerName.trim()} ne "${customer.name}" ke khate pe note likha`,
+        customerName: customer.name,
+        customerId: customer._id,
+        viewerName: viewerName.trim(),
+        note: note.trim()
+      });
+    } catch (notifErr) {
+      console.error('Failed to create notification:', notifErr.message);
+    }
 
     res.status(201).json({
       _id: viewerNote._id,

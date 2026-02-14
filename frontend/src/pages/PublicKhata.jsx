@@ -372,6 +372,13 @@ const PublicKhata = () => {
                                 <span className={`text-xs ${dark ? 'text-gray-600' : 'text-gray-400'}`}>{format(new Date(note.createdAt), 'dd MMM yyyy, hh:mm a')}</span>
                               </div>
                               <p className={`text-sm mt-1 ${dark ? 'text-gray-400' : 'text-gray-600'}`}>{note.note}</p>
+                              {/* Admin Reply */}
+                              {note.adminReply && (
+                                <div className={`mt-2 ml-2 pl-3 border-l-2 rounded-lg p-2 ${dark ? 'border-emerald-600 bg-emerald-900/30' : 'border-emerald-400 bg-emerald-50'}`}>
+                                  <span className={`text-xs font-bold ${dark ? 'text-emerald-400' : 'text-emerald-700'}`}>↩️ Admin Reply</span>
+                                  <p className={`text-sm mt-0.5 ${dark ? 'text-emerald-300' : 'text-emerald-800'}`}>{note.adminReply}</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getTransactions, addTransaction, deleteTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV, getShareToken } from '../api';
+import { getTransactions, addTransaction, deleteTransaction, deleteCustomer, getCustomerPDF, getCustomerCSV, getShareToken, replyToNote } from '../api';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import {
@@ -17,7 +17,8 @@ import {
   HiOutlineClipboardCopy,
   HiOutlineChatAlt2,
   HiOutlineEye,
-  HiOutlineEyeOff
+  HiOutlineEyeOff,
+  HiOutlineReply
 } from 'react-icons/hi';
 
 const CustomerDetail = () => {
@@ -35,6 +36,9 @@ const CustomerDetail = () => {
   const [shareLink, setShareLink] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState({});
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState('');
+  const [replyLoading, setReplyLoading] = useState(false);
 
   useEffect(() => { fetchData(); }, [id]);
 
@@ -120,6 +124,22 @@ const CustomerDetail = () => {
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareLink);
     toast.success('Link copied! WhatsApp pe bhej do 📱');
+  };
+
+  const handleReply = async (noteId) => {
+    if (!replyText.trim()) return toast.error('Reply likhein');
+    setReplyLoading(true);
+    try {
+      await replyToNote(noteId, { reply: replyText.trim() });
+      toast.success('Reply sent!');
+      setReplyingTo(null);
+      setReplyText('');
+      fetchData();
+    } catch (error) {
+      toast.error('Reply failed');
+    } finally {
+      setReplyLoading(false);
+    }
   };
 
   if (loading) return (
@@ -376,18 +396,86 @@ const CustomerDetail = () => {
                   <div className="px-6 pb-4 bg-blue-50/30 border-l-4 border-l-blue-400">
                     <div className="space-y-2 pt-2">
                       {tx.viewerNotes.map((note, idx) => (
-                        <div key={idx} className="flex items-start space-x-3 bg-white rounded-xl p-3 border border-blue-100 shadow-sm">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
-                            {note.viewerName ? note.viewerName.charAt(0).toUpperCase() : '?'}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center space-x-2">
-                              <span className="font-bold text-sm text-gray-800">{note.viewerName || 'Anonymous'}</span>
-                              <span className="text-xs text-gray-400">
-                                {format(new Date(note.createdAt), 'dd MMM yyyy, hh:mm a')}
-                              </span>
+                        <div key={idx} className="bg-white rounded-xl p-3 border border-blue-100 shadow-sm">
+                          <div className="flex items-start space-x-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs flex-shrink-0">
+                              {note.viewerName ? note.viewerName.charAt(0).toUpperCase() : '?'}
                             </div>
-                            <p className="text-sm text-gray-600 mt-0.5">{note.note}</p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-bold text-sm text-gray-800">{note.viewerName || 'Anonymous'}</span>
+                                <span className="text-xs text-gray-400">
+                                  {format(new Date(note.createdAt), 'dd MMM yyyy, hh:mm a')}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-600 mt-0.5">{note.note}</p>
+
+                              {/* Admin Reply Display */}
+                              {note.adminReply && (
+                                <div className="mt-2 ml-2 pl-3 border-l-2 border-emerald-400 bg-emerald-50 rounded-lg p-2">
+                                  <div className="flex items-center space-x-1.5">
+                                    <span className="text-xs font-bold text-emerald-700">↩️ Admin Reply</span>
+                                    {note.adminRepliedAt && (
+                                      <span className="text-xs text-emerald-500">
+                                        {format(new Date(note.adminRepliedAt), 'dd MMM, hh:mm a')}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-emerald-800 mt-0.5">{note.adminReply}</p>
+                                </div>
+                              )}
+
+                              {/* Reply Button */}
+                              {!note.adminReply && replyingTo !== note._id && (
+                                <button
+                                  onClick={() => { setReplyingTo(note._id); setReplyText(''); }}
+                                  className="flex items-center space-x-1 mt-2 text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition-colors"
+                                >
+                                  <HiOutlineReply className="w-3.5 h-3.5" />
+                                  <span>Reply</span>
+                                </button>
+                              )}
+
+                              {/* Reply Input */}
+                              {replyingTo === note._id && (
+                                <div className="mt-2 flex items-center space-x-2">
+                                  <input
+                                    type="text"
+                                    value={replyText}
+                                    onChange={(e) => setReplyText(e.target.value)}
+                                    placeholder="Apna reply likhein..."
+                                    maxLength={300}
+                                    className="flex-1 px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleReply(note._id); }}
+                                    autoFocus
+                                  />
+                                  <button
+                                    onClick={() => handleReply(note._id)}
+                                    disabled={replyLoading}
+                                    className="px-3 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-700 transition-all disabled:opacity-50"
+                                  >
+                                    {replyLoading ? '...' : 'Send'}
+                                  </button>
+                                  <button
+                                    onClick={() => setReplyingTo(null)}
+                                    className="px-2 py-2 text-gray-400 hover:text-gray-600 text-xs rounded-xl transition-all"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              )}
+
+                              {/* Edit Reply (if already replied) */}
+                              {note.adminReply && replyingTo !== note._id && (
+                                <button
+                                  onClick={() => { setReplyingTo(note._id); setReplyText(note.adminReply); }}
+                                  className="flex items-center space-x-1 mt-1 text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+                                >
+                                  <HiOutlinePencil className="w-3 h-3" />
+                                  <span>Edit Reply</span>
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}

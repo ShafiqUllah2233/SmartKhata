@@ -22,6 +22,16 @@ const viewerNoteSchema = new mongoose.Schema({
     required: [true, 'Please add a note'],
     trim: true,
     maxlength: 300
+  },
+  adminReply: {
+    type: String,
+    trim: true,
+    maxlength: 300,
+    default: null
+  },
+  adminRepliedAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

@@ -248,3 +248,37 @@ exports.deleteTransaction = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// @desc    Reply to a viewer note
+// @route   PUT /api/transactions/notes/:noteId/reply
+exports.replyToNote = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const note = await ViewerNote.findById(req.params.noteId);
+    if (!note) {
+      return res.status(404).json({ message: 'Note not found' });
+    }
+
+    // Verify the note belongs to a transaction owned by this user
+    const transaction = await Transaction.findOne({
+      _id: note.transaction,
+      user: req.user._id
+    });
+
+    if (!transaction) {
+      return res.status(403).json({ message: 'Not authorized to reply to this note' });
+    }
+
+    note.adminReply = req.body.reply;
+    note.adminRepliedAt = new Date();
+    await note.save();
+
+    res.json(note);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

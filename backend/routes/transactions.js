@@ -6,7 +6,8 @@ const {
   addTransaction,
   getTransactions,
   deleteTransaction,
-  addSharedExpense
+  addSharedExpense,
+  replyToNote
 } = require('../controllers/transactionController');
 
 router.use(protect);
@@ -24,6 +25,12 @@ router.route('/')
     body('type').isIn(['GIVEN', 'RECEIVED']).withMessage('Type must be GIVEN or RECEIVED'),
     body('amount').isFloat({ min: 0.01 }).withMessage('Amount must be greater than 0')
   ], addTransaction);
+
+// Reply to a viewer note
+router.route('/notes/:noteId/reply')
+  .put([
+    body('reply').trim().isLength({ min: 1, max: 300 }).withMessage('Reply must be 1-300 characters')
+  ], replyToNote);
 
 // Route for deleting: /api/transactions/:id
 router.route('/:id')

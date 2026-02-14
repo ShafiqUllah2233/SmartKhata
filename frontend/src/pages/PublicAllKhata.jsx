@@ -9,6 +9,7 @@ import translations from '../translations';
 import shafiqImg from '../assets/shafiq.jpeg';
 import waseemImg from '../assets/waseem.jpeg';
 import faizanImg from '../assets/faizan.jpeg';
+import KhataChatBot from '../components/KhataChatBot';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -705,6 +706,9 @@ const PublicAllKhata = () => {
           <p className={`text-xs ${dark ? 'text-gray-600' : 'text-gray-400'}`}>📒 {t.poweredBy}</p>
         </div>
       </div>
+
+      {/* AI ChatBot */}
+      <KhataChatBot data={data} lang={lang} dark={dark} />
     </div>
   );
 };

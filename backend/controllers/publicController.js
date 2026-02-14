@@ -36,7 +36,7 @@ exports.getPublicKhata = async (req, res) => {
     // Get viewer notes for these transactions
     const transactionIds = transactions.map(t => t._id);
     const notes = await ViewerNote.find({ transaction: { $in: transactionIds } })
-      .select('transaction viewerName note createdAt')
+      .select('transaction viewerName note createdAt adminReply adminRepliedAt')
       .sort({ createdAt: -1 });
 
     // Group notes by transaction ID
@@ -48,7 +48,9 @@ exports.getPublicKhata = async (req, res) => {
         _id: n._id,
         viewerName: n.viewerName,
         note: n.note,
-        createdAt: n.createdAt
+        createdAt: n.createdAt,
+        adminReply: n.adminReply || null,
+        adminRepliedAt: n.adminRepliedAt || null
       });
     });
 
@@ -233,7 +235,7 @@ exports.getGroupCustomerDetail = async (req, res) => {
     // Get viewer notes for these transactions
     const transactionIds = transactions.map(t => t._id);
     const notes = await ViewerNote.find({ transaction: { $in: transactionIds } })
-      .select('transaction viewerName note createdAt')
+      .select('transaction viewerName note createdAt adminReply adminRepliedAt')
       .sort({ createdAt: -1 });
 
     const notesByTransaction = {};
@@ -244,7 +246,9 @@ exports.getGroupCustomerDetail = async (req, res) => {
         _id: n._id,
         viewerName: n.viewerName,
         note: n.note,
-        createdAt: n.createdAt
+        createdAt: n.createdAt,
+        adminReply: n.adminReply || null,
+        adminRepliedAt: n.adminRepliedAt || null
       });
     });
 

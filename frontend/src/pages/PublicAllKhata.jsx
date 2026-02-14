@@ -264,7 +264,7 @@ const PublicAllKhata = () => {
                 <img
                   src={PROFILE_IMAGES[customerDetail.customer.name.toLowerCase()]}
                   alt={customerDetail.customer.name}
-                  className="w-16 h-16 rounded-2xl object-cover border-2 border-white/30 shadow-lg"
+                  className="w-16 h-16 rounded-2xl object-cover object-top border-2 border-white/30 shadow-lg"
                 />
               ) : (
                 <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-white font-extrabold text-2xl border border-white/20">
@@ -675,7 +675,7 @@ const PublicAllKhata = () => {
                     <img
                       src={PROFILE_IMAGES[c.name.toLowerCase()]}
                       alt={c.name}
-                      className="w-12 h-12 rounded-2xl object-cover flex-shrink-0 shadow-sm border-2 border-emerald-500"
+                      className="w-12 h-12 rounded-2xl object-cover object-top flex-shrink-0 shadow-sm border-2 border-emerald-500"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-extrabold text-lg flex-shrink-0 shadow-sm">

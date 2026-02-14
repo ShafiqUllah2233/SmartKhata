@@ -121,6 +121,35 @@ const PublicKhata = () => {
           </div>
         </div>
 
+        {/* Total Khata - Monthly I Gave */}
+        {(() => {
+          const now = new Date();
+          const currentMonth = now.getMonth();
+          const currentYear = now.getFullYear();
+          const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+          const monthlyTotal = transactions
+            .filter(tx => {
+              if (tx.type !== 'RECEIVED') return false;
+              const txDate = new Date(tx.date);
+              return txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear;
+            })
+            .reduce((sum, tx) => sum + tx.amount, 0);
+          return (
+            <div className={`rounded-3xl shadow-sm border p-5 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${dark ? 'bg-emerald-900/30' : 'bg-emerald-50'}`}>💵</div>
+                  <div>
+                    <p className={`text-xs font-bold uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>Total Khata</p>
+                    <p className={`text-xs mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>{monthNames[currentMonth]} {currentYear}</p>
+                  </div>
+                </div>
+                <p className="text-2xl font-extrabold text-emerald-600">Rs. {monthlyTotal.toLocaleString()}</p>
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Filters */}
         <div className={`rounded-3xl shadow-sm border p-4 sm:p-5 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
           <div className="flex flex-col sm:flex-row items-end gap-3">

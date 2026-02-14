@@ -9,6 +9,7 @@ import translations from '../translations';
 import shafiqImg from '../assets/shafiq.jpeg';
 import waseemImg from '../assets/waseem.jpeg';
 import faizanImg from '../assets/faizan.jpeg';
+import abdullahImg from '../assets/abdullah.jpeg';
 import KhataChatBot from '../components/KhataChatBot';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -23,6 +24,7 @@ const PROFILE_IMAGES = {
   shafiq: shafiqImg,
   waseem: waseemImg,
   faizan: faizanImg,
+  abdullah: abdullahImg,
 };
 
 const PublicAllKhata = () => {

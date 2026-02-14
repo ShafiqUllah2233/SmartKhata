@@ -330,11 +330,29 @@ const PublicAllKhata = () => {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
 
+        {/* Greeting */}
+        {(() => {
+          const hour = new Date().getHours();
+          let greeting, emoji, gradientClass;
+          if (hour >= 5 && hour < 12) { greeting = 'Good Morning'; emoji = '🌅'; gradientClass = 'from-amber-400 via-orange-400 to-yellow-300'; }
+          else if (hour >= 12 && hour < 17) { greeting = 'Good Afternoon'; emoji = '☀️'; gradientClass = 'from-sky-400 via-cyan-400 to-blue-400'; }
+          else if (hour >= 17 && hour < 21) { greeting = 'Good Evening'; emoji = '🌇'; gradientClass = 'from-orange-500 via-rose-400 to-purple-500'; }
+          else { greeting = 'Good Night'; emoji = '🌙'; gradientClass = 'from-indigo-500 via-purple-500 to-blue-600'; }
+          return (
+            <div className="text-center mb-6">
+              <span className="text-4xl">{emoji}</span>
+              <h2 className={`text-2xl sm:text-3xl font-extrabold mt-2 bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>
+                {greeting}, {data.ownerName}!
+              </h2>
+            </div>
+          );
+        })()}
+
         {/* Summary Card */}
         <div className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 rounded-3xl p-6 sm:p-8 mb-6 shadow-2xl shadow-emerald-900/20">
           <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-20 translate-x-20"></div>
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16"></div>
-          <div className="relative z-10">
+          <div className="relative z-10 text-center">
             <h2 className="text-xl font-bold text-white mb-1">📊 Overall Summary</h2>
             <p className="text-sm text-emerald-100/70 mb-5">{data.summary.totalCustomers} Members</p>
 

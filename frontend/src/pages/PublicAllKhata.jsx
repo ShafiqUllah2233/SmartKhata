@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { HiOutlineCash, HiOutlineArrowLeft } from 'react-icons/hi';
 import axios from 'axios';
+import { Bar, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -263,6 +267,43 @@ const PublicAllKhata = () => {
           )}
         </div>
 
+        {/* Monthly Bar Chart */}
+        {customerDetail.transactions.length > 0 && (() => {
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const monthlyData = {};
+          customerDetail.transactions.forEach(tx => {
+            const d = new Date(tx.date);
+            const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            if (!monthlyData[key]) monthlyData[key] = { gave: 0, got: 0 };
+            if (tx.type === 'RECEIVED') monthlyData[key].gave += tx.amount;
+            else monthlyData[key].got += tx.amount;
+          });
+          const labels = Object.keys(monthlyData);
+          const chartData = {
+            labels,
+            datasets: [
+              { label: 'I Gave', data: labels.map(l => monthlyData[l].gave), backgroundColor: 'rgba(16, 185, 129, 0.7)', borderRadius: 8 },
+              { label: 'I Got', data: labels.map(l => monthlyData[l].got), backgroundColor: 'rgba(244, 63, 94, 0.7)', borderRadius: 8 },
+            ],
+          };
+          const options = {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top', labels: { color: dark ? '#d1d5db' : '#374151', font: { weight: 'bold', size: 12 } } },
+              title: { display: true, text: 'Monthly Comparison', color: dark ? '#f3f4f6' : '#1f2937', font: { size: 16, weight: 'bold' } },
+            },
+            scales: {
+              x: { ticks: { color: dark ? '#9ca3af' : '#6b7280' }, grid: { color: dark ? '#374151' : '#f3f4f6' } },
+              y: { ticks: { color: dark ? '#9ca3af' : '#6b7280' }, grid: { color: dark ? '#374151' : '#f3f4f6' } },
+            },
+          };
+          return (
+            <div className={`rounded-3xl shadow-sm border p-5 sm:p-6 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <Bar data={chartData} options={options} />
+            </div>
+          );
+        })()}
+
         <div className="text-center mt-8 pb-6">
           <p className={`text-xs ${dark ? 'text-gray-600' : 'text-gray-400'}`}>📒 Powered By Shafiq Ullah Khan</p>
         </div>
@@ -309,6 +350,36 @@ const PublicAllKhata = () => {
             </div>
           </div>
         </div>
+
+        {/* Pie Chart - Who Owes Most */}
+        {(() => {
+          const owingCustomers = data.customers.filter(c => c.balance > 0);
+          if (owingCustomers.length === 0) return null;
+          const colors = ['#f43f5e', '#fb923c', '#facc15', '#a78bfa', '#38bdf8', '#34d399', '#f472b6', '#818cf8'];
+          const pieData = {
+            labels: owingCustomers.map(c => c.name),
+            datasets: [{
+              data: owingCustomers.map(c => c.balance),
+              backgroundColor: owingCustomers.map((_, i) => colors[i % colors.length]),
+              borderWidth: 2,
+              borderColor: dark ? '#1f2937' : '#ffffff',
+            }],
+          };
+          const pieOptions = {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: dark ? '#d1d5db' : '#374151', font: { weight: 'bold', size: 12 }, padding: 16 } },
+              title: { display: true, text: 'Who Owes Most?', color: dark ? '#f3f4f6' : '#1f2937', font: { size: 16, weight: 'bold' }, padding: { bottom: 16 } },
+            },
+          };
+          return (
+            <div className={`rounded-3xl shadow-sm border p-5 sm:p-6 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <div className="max-w-sm mx-auto">
+                <Pie data={pieData} options={pieOptions} />
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Customer List */}
         <div className={`rounded-3xl shadow-sm border overflow-hidden transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>

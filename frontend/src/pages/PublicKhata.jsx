@@ -1,8 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { HiOutlineCash } from 'react-icons/hi';
 import axios from 'axios';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -230,6 +234,43 @@ const PublicKhata = () => {
             </div>
           )}
         </div>
+
+        {/* Monthly Bar Chart */}
+        {transactions.length > 0 && (() => {
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          const monthlyData = {};
+          transactions.forEach(tx => {
+            const d = new Date(tx.date);
+            const key = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            if (!monthlyData[key]) monthlyData[key] = { gave: 0, got: 0 };
+            if (tx.type === 'RECEIVED') monthlyData[key].gave += tx.amount;
+            else monthlyData[key].got += tx.amount;
+          });
+          const labels = Object.keys(monthlyData);
+          const chartData = {
+            labels,
+            datasets: [
+              { label: 'I Gave', data: labels.map(l => monthlyData[l].gave), backgroundColor: 'rgba(16, 185, 129, 0.7)', borderRadius: 8 },
+              { label: 'I Got', data: labels.map(l => monthlyData[l].got), backgroundColor: 'rgba(244, 63, 94, 0.7)', borderRadius: 8 },
+            ],
+          };
+          const options = {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top', labels: { color: dark ? '#d1d5db' : '#374151', font: { weight: 'bold', size: 12 } } },
+              title: { display: true, text: 'Monthly Comparison', color: dark ? '#f3f4f6' : '#1f2937', font: { size: 16, weight: 'bold' } },
+            },
+            scales: {
+              x: { ticks: { color: dark ? '#9ca3af' : '#6b7280' }, grid: { color: dark ? '#374151' : '#f3f4f6' } },
+              y: { ticks: { color: dark ? '#9ca3af' : '#6b7280' }, grid: { color: dark ? '#374151' : '#f3f4f6' } },
+            },
+          };
+          return (
+            <div className={`rounded-3xl shadow-sm border p-5 sm:p-6 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
+              <Bar data={chartData} options={options} />
+            </div>
+          );
+        })()}
 
         {/* Footer */}
         <div className="text-center mt-8 pb-6">

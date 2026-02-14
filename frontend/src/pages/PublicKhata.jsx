@@ -144,7 +144,7 @@ const PublicKhata = () => {
                 <div className="flex items-center space-x-3">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl ${dark ? 'bg-emerald-900/30' : 'bg-emerald-50'}`}>💵</div>
                   <div>
-                    <p className={`text-xs font-bold uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>Total Khata</p>
+                    <p className={`text-xs font-bold uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>Total Expense</p>
                     <p className={`text-xs mt-0.5 ${dark ? 'text-gray-500' : 'text-gray-400'}`}>{monthNames[currentMonth]} {currentYear}</p>
                   </div>
                 </div>

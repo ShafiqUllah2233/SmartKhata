@@ -342,7 +342,7 @@ const PublicAllKhata = () => {
             <div className="text-center mb-6">
               <span className="text-4xl">{emoji}</span>
               <h2 className={`text-2xl sm:text-3xl font-extrabold mt-2 bg-gradient-to-r ${gradientClass} bg-clip-text text-transparent`}>
-                {greeting}, {data.ownerName}!
+                {greeting}, Friends!
               </h2>
             </div>
           );

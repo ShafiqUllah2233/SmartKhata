@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const { register, login, getMe, updatePassword } = require('../controllers/authController');
+const { register, login, getMe, updatePassword, updateKhataName } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 
 router.post('/register', [
@@ -21,5 +21,7 @@ router.put('/password', protect, [
   body('currentPassword').notEmpty().withMessage('Current password is required'),
   body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters')
 ], updatePassword);
+
+router.put('/khata-name', protect, updateKhataName);
 
 module.exports = router;

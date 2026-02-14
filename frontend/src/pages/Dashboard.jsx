@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getDashboard, getCustomers, getMe, addSharedExpense } from '../api';
+import { getDashboard, getCustomers, getMe, addSharedExpense, updateKhataName } from '../api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import {
@@ -25,6 +25,10 @@ const Dashboard = () => {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseLoading, setExpenseLoading] = useState(false);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  const [khataName, setKhataName] = useState('');
+  const [editingKhataName, setEditingKhataName] = useState(false);
+  const [khataNameInput, setKhataNameInput] = useState('');
+  const [khataNameLoading, setKhataNameLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -44,6 +48,9 @@ const Dashboard = () => {
         const meRes = await getMe();
         if (meRes.data?.groupShareToken) {
           setGroupToken(meRes.data.groupShareToken);
+        }
+        if (meRes.data?.khataName) {
+          setKhataName(meRes.data.khataName);
         }
       } catch (e) { /* ignore */ }
     } catch (error) {
@@ -71,6 +78,24 @@ const Dashboard = () => {
       toast.error(error.response?.data?.message || 'Failed to add shared expense');
     } finally {
       setExpenseLoading(false);
+    }
+  };
+
+  const handleSaveKhataName = async () => {
+    if (!khataNameInput.trim()) {
+      toast.error('Enter a khata name');
+      return;
+    }
+    setKhataNameLoading(true);
+    try {
+      const res = await updateKhataName({ khataName: khataNameInput.trim() });
+      setKhataName(res.data.khataName);
+      setEditingKhataName(false);
+      toast.success('Khata name updated!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update khata name');
+    } finally {
+      setKhataNameLoading(false);
     }
   };
 
@@ -103,6 +128,43 @@ const Dashboard = () => {
             <p className="text-emerald-200 text-sm font-medium mb-1">{greeting()} ✨</p>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">{user?.name || 'User'}</h1>
             <p className="text-emerald-100/80 text-sm sm:text-base">Here is your account overview for today</p>
+            {/* Khata Name Setting */}
+            <div className="mt-3 flex items-center gap-2">
+              {editingKhataName ? (
+                <>
+                  <input
+                    type="text"
+                    value={khataNameInput}
+                    onChange={e => setKhataNameInput(e.target.value)}
+                    placeholder="e.g. Flat Khata"
+                    className="px-3 py-1.5 rounded-xl text-sm text-gray-800 bg-white/90 border-0 outline-none focus:ring-2 focus:ring-emerald-300 w-48"
+                    autoFocus
+                    onKeyDown={e => e.key === 'Enter' && handleSaveKhataName()}
+                  />
+                  <button
+                    onClick={handleSaveKhataName}
+                    disabled={khataNameLoading}
+                    className="px-3 py-1.5 bg-white/20 text-white text-sm rounded-xl hover:bg-white/30 transition-colors font-semibold"
+                  >
+                    {khataNameLoading ? '...' : 'Save'}
+                  </button>
+                  <button
+                    onClick={() => setEditingKhataName(false)}
+                    className="px-2 py-1.5 text-white/60 text-sm hover:text-white transition-colors"
+                  >
+                    ✕
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { setKhataNameInput(khataName || ''); setEditingKhataName(true); }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 text-emerald-100 text-sm rounded-xl hover:bg-white/20 transition-colors border border-white/10"
+                >
+                  <span>📝</span>
+                  <span>{khataName ? `Khata: ${khataName}` : 'Set Khata Name'}</span>
+                </button>
+              )}
+            </div>
           </div>
           <div className="mt-5 sm:mt-0 flex flex-wrap gap-3">
             <Link

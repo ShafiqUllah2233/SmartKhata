@@ -30,6 +30,7 @@ export const registerUser = (data) => API.post('/auth/register', data);
 export const loginUser = (data) => API.post('/auth/login', data);
 export const getMe = () => API.get('/auth/me');
 export const updatePassword = (data) => API.put('/auth/password', data);
+export const updateKhataName = (data) => API.put('/auth/khata-name', data);
 
 // Customers
 export const getCustomers = (params) => API.get('/customers', { params });

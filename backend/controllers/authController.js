@@ -86,7 +86,34 @@ exports.getMe = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      groupShareToken: user.groupShareToken
+      groupShareToken: user.groupShareToken,
+      khataName: user.khataName || ''
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// @desc    Update khata name
+// @route   PUT /api/auth/khata-name
+exports.updateKhataName = async (req, res) => {
+  try {
+    const { khataName } = req.body;
+    if (!khataName || !khataName.trim()) {
+      return res.status(400).json({ message: 'Khata name is required' });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { khataName: khataName.trim() },
+      { new: true }
+    );
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      groupShareToken: user.groupShareToken,
+      khataName: user.khataName
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

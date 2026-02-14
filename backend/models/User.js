@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true,
     default: () => crypto.randomBytes(10).toString('hex')
+  },
+  khataName: {
+    type: String,
+    trim: true,
+    maxlength: 100,
+    default: ''
   }
 }, {
   timestamps: true

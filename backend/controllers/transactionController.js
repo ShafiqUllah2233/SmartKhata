@@ -132,16 +132,21 @@ exports.addSharedExpense = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { amount, description } = req.body;
+    const { amount, description, customerIds } = req.body;
 
-    // Get all customers for this user
-    const customers = await Customer.find({ user: req.user._id });
+    // Get customers - either selected ones or all
+    let customers;
+    if (customerIds && Array.isArray(customerIds) && customerIds.length > 0) {
+      customers = await Customer.find({ user: req.user._id, _id: { $in: customerIds } });
+    } else {
+      customers = await Customer.find({ user: req.user._id });
+    }
 
     if (customers.length === 0) {
       return res.status(400).json({ message: 'No customers found. Add customers first.' });
     }
 
-    // Divide by (customers + admin)
+    // Divide by (selected customers + admin)
     const totalMembers = customers.length + 1;
     const perPerson = Math.round((amount / totalMembers) * 100) / 100; // Round to 2 decimals
 

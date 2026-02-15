@@ -25,6 +25,8 @@ const Dashboard = () => {
   const [expenseDesc, setExpenseDesc] = useState('');
   const [expenseLoading, setExpenseLoading] = useState(false);
   const [totalCustomers, setTotalCustomers] = useState(0);
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
   const [khataName, setKhataName] = useState('');
   const [editingKhataName, setEditingKhataName] = useState(false);
   const [khataNameInput, setKhataNameInput] = useState('');
@@ -43,6 +45,8 @@ const Dashboard = () => {
       setStats(dashRes.data);
       setRecentCustomers(custRes.data.slice(0, 5));
       setTotalCustomers(custRes.data.length);
+      setAllCustomers(custRes.data);
+      setSelectedCustomerIds(custRes.data.map(c => c._id));
       // Fetch group share token
       try {
         const meRes = await getMe();
@@ -60,15 +64,36 @@ const Dashboard = () => {
     }
   };
 
+  const handleToggleCustomer = (id) => {
+    setSelectedCustomerIds(prev =>
+      prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedCustomerIds.length === allCustomers.length) {
+      setSelectedCustomerIds([]);
+    } else {
+      setSelectedCustomerIds(allCustomers.map(c => c._id));
+    }
+  };
+
+  const selectedCount = selectedCustomerIds.length;
+  const totalMembersForSplit = selectedCount + 1; // selected customers + you
+
   const handleSharedExpense = async () => {
     const amt = parseFloat(expenseAmount);
     if (!amt || amt <= 0) {
       toast.error('Enter a valid amount');
       return;
     }
+    if (selectedCount === 0) {
+      toast.error('Kam se kam ek customer select karo');
+      return;
+    }
     setExpenseLoading(true);
     try {
-      const res = await addSharedExpense({ amount: amt, description: expenseDesc });
+      const res = await addSharedExpense({ amount: amt, description: expenseDesc, customerIds: selectedCustomerIds });
       toast.success(res.data.message);
       setShowExpenseModal(false);
       setExpenseAmount('');
@@ -334,25 +359,70 @@ const Dashboard = () => {
       {/* Shared Expense Modal */}
       {showExpenseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" onClick={() => setShowExpenseModal(false)}>
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 sm:p-8 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center space-x-3 mb-6">
               <div className="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center">
                 <HiOutlineCash className="w-6 h-6 text-amber-600" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-800">Shared Expense</h3>
-                <p className="text-sm text-gray-400">Split equally among all members</p>
+                <p className="text-sm text-gray-400">Split equally among selected members</p>
               </div>
             </div>
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
               <p className="text-sm text-amber-800 font-medium">
-                Total members: <span className="font-bold text-amber-900">{totalCustomers + 1}</span> ({totalCustomers} customers + you)
+                Total members: <span className="font-bold text-amber-900">{totalMembersForSplit}</span> ({selectedCount} customers + you)
               </p>
-              {expenseAmount && parseFloat(expenseAmount) > 0 && (
+              {expenseAmount && parseFloat(expenseAmount) > 0 && selectedCount > 0 && (
                 <p className="text-sm text-amber-800 mt-1">
-                  Per person: <span className="font-bold text-amber-900">Rs. {(Math.round((parseFloat(expenseAmount) / (totalCustomers + 1)) * 100) / 100).toLocaleString()}</span>
+                  Per person: <span className="font-bold text-amber-900">Rs. {(Math.round((parseFloat(expenseAmount) / totalMembersForSplit) * 100) / 100).toLocaleString()}</span>
                 </p>
+              )}
+            </div>
+
+            {/* Customer Selection */}
+            <div className="mb-5">
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700">Kis kis pe lagana hai?</label>
+                <button
+                  type="button"
+                  onClick={handleSelectAll}
+                  className="text-xs font-semibold text-amber-600 hover:text-amber-700 transition-colors"
+                >
+                  {selectedCustomerIds.length === allCustomers.length ? 'Deselect All' : 'Select All'}
+                </button>
+              </div>
+              <div className="border border-gray-200 rounded-2xl max-h-48 overflow-y-auto divide-y divide-gray-100">
+                {allCustomers.map((cust) => {
+                  const isSelected = selectedCustomerIds.includes(cust._id);
+                  return (
+                    <label
+                      key={cust._id}
+                      className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                        isSelected ? 'bg-amber-50/60' : 'hover:bg-gray-50'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => handleToggleCustomer(cust._id)}
+                        className="w-4.5 h-4.5 rounded-md border-gray-300 text-amber-500 focus:ring-amber-500 accent-amber-500 cursor-pointer"
+                      />
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold ${
+                        isSelected ? 'bg-gradient-to-br from-amber-400 to-amber-500' : 'bg-gray-300'
+                      }`}>
+                        {cust.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className={`text-sm font-medium ${
+                        isSelected ? 'text-gray-800' : 'text-gray-400'
+                      }`}>{cust.name}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              {allCustomers.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-3">Koi customer nahi mila</p>
               )}
             </div>
 
@@ -389,10 +459,10 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={handleSharedExpense}
-                disabled={expenseLoading || !expenseAmount}
+                disabled={expenseLoading || !expenseAmount || selectedCount === 0}
                 className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-2xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {expenseLoading ? 'Splitting...' : 'Split & Add'}
+                {expenseLoading ? 'Splitting...' : `Split & Add (${selectedCount})`}
               </button>
             </div>
           </div>

@@ -278,7 +278,6 @@ const Dashboard = () => {
           gradient="from-violet-500 to-violet-600"
           bgLight="bg-violet-50"
           textColor="text-violet-600"
-          subtitle="(Maine Lene Hain - Maine Dene Hain)"
         />
       </div>
 

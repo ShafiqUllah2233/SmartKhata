@@ -271,11 +271,14 @@ const Dashboard = () => {
         />
         <StatCard
           title="Total Khata"
-          value={`Rs. ${(stats?.netBalance || 0).toLocaleString()}`}
+          value={`Rs. ${(
+            (stats?.totalToReceive || 0) - (stats?.totalToPay || 0)
+          ).toLocaleString()}`}
           icon={<HiOutlineCash className="w-6 h-6" />}
           gradient="from-violet-500 to-violet-600"
           bgLight="bg-violet-50"
           textColor="text-violet-600"
+          subtitle="(Maine Lene Hain - Maine Dene Hain)"
         />
       </div>
 

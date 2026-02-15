@@ -132,7 +132,7 @@ exports.addSharedExpense = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { amount, description, customerIds } = req.body;
+    const { amount, description, customerIds, includeAdmin } = req.body;
 
     // Get customers - either selected ones or all
     let customers;
@@ -146,8 +146,9 @@ exports.addSharedExpense = async (req, res) => {
       return res.status(400).json({ message: 'No customers found. Add customers first.' });
     }
 
-    // Divide by (selected customers + admin)
-    const totalMembers = customers.length + 1;
+    // Divide by (selected customers + admin if included)
+    const adminIncluded = includeAdmin !== false; // default true for backward compatibility
+    const totalMembers = customers.length + (adminIncluded ? 1 : 0);
     const perPerson = Math.round((amount / totalMembers) * 100) / 100; // Round to 2 decimals
 
     const transactions = [];
@@ -177,11 +178,12 @@ exports.addSharedExpense = async (req, res) => {
     }
 
     res.status(201).json({
-      message: `Rs. ${amount} divided among ${totalMembers} members (Rs. ${perPerson} each)`,
+      message: `Rs. ${amount} divided among ${totalMembers} members (Rs. ${perPerson} each)${adminIncluded ? '' : ' (admin excluded)'}`,
       totalAmount: amount,
       totalMembers,
       perPerson,
-      adminShare: perPerson,
+      adminShare: adminIncluded ? perPerson : 0,
+      adminIncluded,
       transactions
     });
   } catch (error) {

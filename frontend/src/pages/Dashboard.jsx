@@ -27,6 +27,7 @@ const Dashboard = () => {
   const [totalCustomers, setTotalCustomers] = useState(0);
   const [allCustomers, setAllCustomers] = useState([]);
   const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
+  const [includeAdmin, setIncludeAdmin] = useState(true);
   const [khataName, setKhataName] = useState('');
   const [editingKhataName, setEditingKhataName] = useState(false);
   const [khataNameInput, setKhataNameInput] = useState('');
@@ -71,15 +72,18 @@ const Dashboard = () => {
   };
 
   const handleSelectAll = () => {
-    if (selectedCustomerIds.length === allCustomers.length) {
+    const allSelected = selectedCustomerIds.length === allCustomers.length && includeAdmin;
+    if (allSelected) {
       setSelectedCustomerIds([]);
+      setIncludeAdmin(false);
     } else {
       setSelectedCustomerIds(allCustomers.map(c => c._id));
+      setIncludeAdmin(true);
     }
   };
 
   const selectedCount = selectedCustomerIds.length;
-  const totalMembersForSplit = selectedCount + 1; // selected customers + you
+  const totalMembersForSplit = selectedCount + (includeAdmin ? 1 : 0);
 
   const handleSharedExpense = async () => {
     const amt = parseFloat(expenseAmount);
@@ -87,13 +91,17 @@ const Dashboard = () => {
       toast.error('Enter a valid amount');
       return;
     }
-    if (selectedCount === 0) {
-      toast.error('Kam se kam ek customer select karo');
+    if (totalMembersForSplit === 0) {
+      toast.error('Kam se kam ek member select karo');
+      return;
+    }
+    if (selectedCount === 0 && includeAdmin) {
+      toast.error('Sirf admin select hai — kam se kam ek customer bhi select karo');
       return;
     }
     setExpenseLoading(true);
     try {
-      const res = await addSharedExpense({ amount: amt, description: expenseDesc, customerIds: selectedCustomerIds });
+      const res = await addSharedExpense({ amount: amt, description: expenseDesc, customerIds: selectedCustomerIds, includeAdmin });
       toast.success(res.data.message);
       setShowExpenseModal(false);
       setExpenseAmount('');
@@ -372,9 +380,9 @@ const Dashboard = () => {
 
             <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-6">
               <p className="text-sm text-amber-800 font-medium">
-                Total members: <span className="font-bold text-amber-900">{totalMembersForSplit}</span> ({selectedCount} customers + you)
+                Total members: <span className="font-bold text-amber-900">{totalMembersForSplit}</span> ({selectedCount} customer{selectedCount !== 1 ? 's' : ''}{includeAdmin ? ' + you' : ''})
               </p>
-              {expenseAmount && parseFloat(expenseAmount) > 0 && selectedCount > 0 && (
+              {expenseAmount && parseFloat(expenseAmount) > 0 && totalMembersForSplit > 0 && (
                 <p className="text-sm text-amber-800 mt-1">
                   Per person: <span className="font-bold text-amber-900">Rs. {(Math.round((parseFloat(expenseAmount) / totalMembersForSplit) * 100) / 100).toLocaleString()}</span>
                 </p>
@@ -394,6 +402,28 @@ const Dashboard = () => {
                 </button>
               </div>
               <div className="border border-gray-200 rounded-2xl max-h-48 overflow-y-auto divide-y divide-gray-100">
+                {/* Admin (You) */}
+                <label
+                  className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${
+                    includeAdmin ? 'bg-emerald-50/60' : 'hover:bg-gray-50'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={includeAdmin}
+                    onChange={() => setIncludeAdmin(prev => !prev)}
+                    className="w-4.5 h-4.5 rounded-md border-gray-300 text-emerald-500 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
+                  />
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-white text-sm font-bold ${
+                    includeAdmin ? 'bg-gradient-to-br from-emerald-400 to-emerald-500' : 'bg-gray-300'
+                  }`}>
+                    {(user?.name || 'A').charAt(0).toUpperCase()}
+                  </div>
+                  <span className={`text-sm font-medium ${
+                    includeAdmin ? 'text-gray-800' : 'text-gray-400'
+                  }`}>{user?.name || 'Admin'} <span className="text-xs text-emerald-600 font-semibold">(You)</span></span>
+                </label>
+                {/* Customers */}
                 {allCustomers.map((cust) => {
                   const isSelected = selectedCustomerIds.includes(cust._id);
                   return (
@@ -459,10 +489,10 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={handleSharedExpense}
-                disabled={expenseLoading || !expenseAmount || selectedCount === 0}
+                disabled={expenseLoading || !expenseAmount || totalMembersForSplit === 0 || selectedCount === 0}
                 className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-2xl font-bold hover:bg-amber-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {expenseLoading ? 'Splitting...' : `Split & Add (${selectedCount})`}
+                {expenseLoading ? 'Splitting...' : `Split & Add (${totalMembersForSplit})`}
               </button>
             </div>
           </div>

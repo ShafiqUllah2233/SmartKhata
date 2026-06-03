@@ -258,34 +258,7 @@ const PublicKhata = () => {
           );
         })()}
 
-        {/* Filters */}
-        <div className={`rounded-3xl shadow-sm border p-4 sm:p-5 mb-6 transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>
-          <div className="flex flex-col sm:flex-row items-end gap-3">
-            <div className="flex-1 w-full">
-              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>{t.from}</label>
-              <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`} />
-            </div>
-            <div className="flex-1 w-full">
-              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>{t.to}</label>
-              <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`} />
-            </div>
-            <div className="flex-1 w-full">
-              <label className={`block text-xs font-bold mb-1.5 uppercase tracking-wider ${dark ? 'text-gray-400' : 'text-gray-400'}`}>{t.type}</label>
-              <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-                className={`w-full px-3 py-2.5 border rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer ${dark ? 'bg-gray-700 border-gray-600 text-gray-200' : 'bg-gray-50 border-gray-200'}`}>
-                <option value="">{t.all}</option>
-                <option value="GIVEN">{t.iGot}</option>
-                <option value="RECEIVED">{t.iGave}</option>
-              </select>
-            </div>
-            <div className="flex gap-2">
-              <button onClick={applyFilters} className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-sm">{t.filter}</button>
-              <button onClick={clearFilters} className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${dark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>{t.clear}</button>
-            </div>
-          </div>
-        </div>
+        {/* Filters removed */}
 
         {/* Transaction History */}
         <div className={`rounded-3xl shadow-sm border overflow-hidden transition-colors duration-300 ${dark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'}`}>

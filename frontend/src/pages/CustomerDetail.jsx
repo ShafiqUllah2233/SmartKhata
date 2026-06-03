@@ -62,13 +62,22 @@ const CustomerDetail = () => {
     if (!txForm.amount || parseFloat(txForm.amount) <= 0) return toast.error('Enter a valid amount');
     setTxLoading(true);
     try {
-      await addTransaction(id, { type: txType, amount: parseFloat(txForm.amount), description: txForm.description, date: txForm.date });
+      const { data: newTransaction } = await addTransaction(id, { type: txType, amount: parseFloat(txForm.amount), description: txForm.description, date: txForm.date });
       toast.success(txType === 'GIVEN' ? 'Paise diye record hogaye' : 'Paise liye record hogaye');
       setShowAddForm(false);
       setTxForm({ amount: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
-      fetchData();
-    } catch (error) { toast.error('Failed to add transaction'); }
-    finally { setTxLoading(false); }
+      
+      // Update transactions state by adding the new one to the top
+      setTransactions(prevTransactions => [newTransaction, ...prevTransactions]);
+
+      // Re-fetch summary data to update balance
+      fetchData(); 
+
+    } catch (error) { 
+      toast.error('Failed to add transaction'); 
+    } finally { 
+      setTxLoading(false); 
+    }
   };
 
   const handleDeleteTransaction = async (txId) => {

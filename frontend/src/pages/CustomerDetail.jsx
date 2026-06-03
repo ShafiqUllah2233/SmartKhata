@@ -11,7 +11,6 @@ import {
   HiOutlineDocumentDownload,
   HiOutlineDownload,
   HiOutlineX,
-  HiOutlineFilter,
   HiOutlineCash,
   HiOutlineShare,
   HiOutlineClipboardCopy,
@@ -32,7 +31,6 @@ const CustomerDetail = () => {
   const [txType, setTxType] = useState('GIVEN');
   const [txForm, setTxForm] = useState({ amount: '', description: '', date: format(new Date(), 'yyyy-MM-dd') });
   const [txLoading, setTxLoading] = useState(false);
-  const [filters, setFilters] = useState({ startDate: '', endDate: '', type: '' });
   const [shareLink, setShareLink] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState({});
@@ -143,15 +141,7 @@ const CustomerDetail = () => {
     } catch (error) { toast.error('Failed to download CSV'); }
   };
 
-  const applyFilters = () => {
-    const params = {};
-    if (filters.startDate) params.startDate = filters.startDate;
-    if (filters.endDate) params.endDate = filters.endDate;
-    if (filters.type) params.type = filters.type;
-    fetchData(params);
-  };
-
-  const clearFilters = () => { setFilters({ startDate: '', endDate: '', type: '' }); fetchData(); };
+  // Filters removed
 
   const handleShare = async () => {
     try {

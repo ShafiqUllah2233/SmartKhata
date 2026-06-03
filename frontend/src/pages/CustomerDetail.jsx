@@ -342,35 +342,6 @@ const CustomerDetail = () => {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-4 sm:p-5 mb-6">
-        <div className="flex flex-col sm:flex-row items-end gap-3">
-          <div className="flex-1 w-full">
-            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">From</label>
-            <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" />
-          </div>
-          <div className="flex-1 w-full">
-            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">To</label>
-            <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all" />
-          </div>
-          <div className="flex-1 w-full">
-            <label className="block text-xs font-bold text-gray-400 mb-1.5 uppercase tracking-wider">Type</label>
-            <select value={filters.type} onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all cursor-pointer">
-              <option value="">All</option>
-              <option value="GIVEN">Maine Diye</option>
-              <option value="RECEIVED">Maine Liye</option>
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={applyFilters} className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-all shadow-sm">Filter</button>
-            <button onClick={clearFilters} className="px-4 py-2.5 bg-gray-100 rounded-xl text-sm font-semibold text-gray-500 hover:bg-gray-200 transition-all">Clear</button>
-          </div>
-        </div>
-      </div>
-
       {/* Transaction History */}
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100">
